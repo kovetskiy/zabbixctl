@@ -26,12 +26,22 @@ func (response *ResponseRaw) Error() error {
 	return nil
 }
 
-type ResponseTriggersList struct {
+type ResponseLogin struct {
+	ResponseRaw
+	Token string `json:"result"`
+}
+
+type ResponseTriggers struct {
 	ResponseRaw
 	Data map[string]Trigger `json:"result"`
 }
 
-type ResponseLogin struct {
+type ResponseItems struct {
 	ResponseRaw
-	Token string `json:"result"`
+	Data []Item `json:"result"`
+}
+
+type ResponseHosts struct {
+	ResponseRaw
+	Data []Host `json:"result"`
 }

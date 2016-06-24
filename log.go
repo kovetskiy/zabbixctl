@@ -1,53 +1,38 @@
 package main
 
-import (
-	"fmt"
-	"strings"
+import "fmt"
+import "github.com/kovetskiy/lorg"
+import "os"
 
-	"github.com/kovetskiy/lorg"
-)
-
-func getLogger(verbosity int) lorg.Logger {
+func getLogger() *lorg.Log {
 	logger := lorg.NewLog()
 	logger.SetFormat(lorg.NewFormat("${level:[%s]:left:true} %s"))
-	if verbosity == 1 {
-		logger.SetLevel(lorg.LevelDebug)
-	} else if verbosity == 2 {
-		logger.SetLevel(lorg.LevelTrace)
-	}
 
 	return logger
 }
 
 func fatalf(format string, values ...interface{}) {
-	logger.Fatalf(wrapNewLines(format, values...))
+	fmt.Fprintf(os.Stderr, format, values...)
+	os.Exit(1)
 }
 
 func fatalln(value interface{}) {
-	logger.Fatal(wrapNewLines("%s", value))
+	fmt.Fprintln(os.Stderr, value)
+	os.Exit(1)
 }
 
 func debugf(format string, values ...interface{}) {
-	logger.Debugf(wrapNewLines(format, values...))
-}
-
-func debugln(value interface{}) {
-	logger.Debug(wrapNewLines("%s", value))
+	logger.Debugf(format, values...)
 }
 
 func tracef(format string, values ...interface{}) {
-	logger.Trace(wrapNewLines(format, values...))
+	logger.Tracef(format, values...)
 }
 
-func wrapNewLines(format string, values ...interface{}) string {
-	contents := fmt.Sprintf(format, values...)
-	contents = strings.TrimSuffix(contents, "\n")
-	contents = strings.Replace(
-		contents,
-		"\n",
-		"\n"+strings.Repeat(" ", 8),
-		-1,
-	)
+func debugln(value interface{}) {
+	logger.Debug(value)
+}
 
-	return contents
+func traceln(value interface{}) {
+	logger.Trace(value)
 }

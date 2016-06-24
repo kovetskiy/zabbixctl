@@ -5,11 +5,18 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	"github.com/zazab/hierr"
+)
+
+const (
+	// 900 is default zabbix session ttl, -60 for safety
+	ZabbixSessionTTL = 900 - 60
 )
 
 type Params map[string]interface{}
@@ -23,13 +30,18 @@ type Request struct {
 }
 
 type Zabbix struct {
-	address   string
-	token     string
+	basicURL  string
+	apiURL    string
+	session   string
 	client    *http.Client
 	requestID int64
 }
 
-func NewZabbix(address, username, password string) (*Zabbix, error) {
+func NewZabbix(
+	address, username, password, sessionFile string,
+) (*Zabbix, error) {
+	var err error
+
 	zabbix := &Zabbix{
 		client: &http.Client{},
 	}
@@ -38,9 +50,96 @@ func NewZabbix(address, username, password string) (*Zabbix, error) {
 		address = "http://" + address
 	}
 
-	zabbix.address = strings.TrimSuffix(address, "/") + "/api_jsonrpc.php"
+	zabbix.basicURL = strings.TrimSuffix(address, "/")
+	zabbix.apiURL = zabbix.basicURL + "/api_jsonrpc.php"
 
-	return zabbix, zabbix.Login(username, password)
+	if sessionFile != "" {
+		debugln("* reading session file")
+
+		err = zabbix.restoreSession(sessionFile)
+		if err != nil {
+			return nil, hierr.Errorf(
+				err,
+				"can't restore zabbix session using file '%s'",
+				sessionFile,
+			)
+		}
+	} else {
+		debugln("* session feature is not used")
+	}
+
+	if zabbix.session == "" {
+		err = zabbix.Login(username, password)
+		if err != nil {
+			return nil, hierr.Errorf(
+				err,
+				"can't authorize user '%s' in zabbix server",
+				username,
+			)
+		}
+	} else {
+		debugln("* using session instead of authorization")
+	}
+
+	if sessionFile != "" {
+		debugln("* rewriting session file")
+
+		// always rewrite session file, it will change modify date
+		err = zabbix.saveSession(sessionFile)
+		if err != nil {
+			return nil, hierr.Errorf(
+				err,
+				"can't save zabbix session to file '%s'",
+			)
+		}
+	}
+
+	return zabbix, nil
+}
+
+func (zabbix *Zabbix) restoreSession(path string) error {
+	file, err := os.OpenFile(
+		path, os.O_CREATE|os.O_RDWR, 0600,
+	)
+	if err != nil {
+		return hierr.Errorf(
+			err, "can't open session file",
+		)
+	}
+
+	stat, err := file.Stat()
+	if err != nil {
+		return hierr.Errorf(
+			err, "can't stat session file",
+		)
+	}
+
+	if time.Now().Sub(stat.ModTime()).Seconds() < ZabbixSessionTTL {
+		session, err := ioutil.ReadAll(file)
+		if err != nil {
+			return hierr.Errorf(
+				err, "can't read session file",
+			)
+		}
+
+		zabbix.session = string(session)
+	} else {
+		debugln("* session is outdated")
+	}
+
+	return nil
+}
+
+func (zabbix *Zabbix) saveSession(path string) error {
+	err := ioutil.WriteFile(path, []byte(zabbix.session), 0600)
+	if err != nil {
+		return hierr.Errorf(
+			err,
+			"can't write session file",
+		)
+	}
+
+	return nil
 }
 
 func (zabbix *Zabbix) Login(username, password string) error {
@@ -57,7 +156,7 @@ func (zabbix *Zabbix) Login(username, password string) error {
 		return err
 	}
 
-	zabbix.token = response.Token
+	zabbix.session = response.Token
 
 	return nil
 }
@@ -98,7 +197,7 @@ func (zabbix *Zabbix) GetTriggers(extend Params) ([]Trigger, error) {
 		params[key] = value
 	}
 
-	var response ResponseTriggersList
+	var response ResponseTriggers
 	err := zabbix.call("trigger.get", params, &response)
 	if err != nil {
 		return nil, err
@@ -112,6 +211,34 @@ func (zabbix *Zabbix) GetTriggers(extend Params) ([]Trigger, error) {
 	return triggers, nil
 }
 
+func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
+	debugln("* retrieving items list")
+
+	var response ResponseItems
+	err := zabbix.call("item.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Data, nil
+}
+
+func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
+	debugf("* retrieving hosts list")
+
+	var response ResponseHosts
+	err := zabbix.call("host.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Data, nil
+}
+
+func (zabbix *Zabbix) GetGraphURL(identifier string) string {
+	return zabbix.basicURL + "/history.php?action=showgraph&itemids[]=" + identifier
+}
+
 func (zabbix *Zabbix) call(
 	method string, params Params, response Response,
 ) error {
@@ -122,7 +249,7 @@ func (zabbix *Zabbix) call(
 		RPC:    "2.0",
 		Method: method,
 		Params: params,
-		Auth:   zabbix.token,
+		Auth:   zabbix.session,
 		ID:     atomic.AddInt64(&zabbix.requestID, 1),
 	}
 
@@ -136,7 +263,7 @@ func (zabbix *Zabbix) call(
 
 	payload, err := http.NewRequest(
 		"POST",
-		zabbix.address,
+		zabbix.apiURL,
 		bytes.NewReader(buffer),
 	)
 	if err != nil {
@@ -166,8 +293,13 @@ func (zabbix *Zabbix) call(
 		)
 	}
 
-	tracef("<~ %s", string(body))
 	debugf("<~ %s", resource.Status)
+
+	if traceMode {
+		var tracing bytes.Buffer
+		json.Indent(&tracing, body, "", "  ")
+		tracef("<~ %s", tracing.String())
+	}
 
 	err = json.Unmarshal(body, response)
 	if err != nil {

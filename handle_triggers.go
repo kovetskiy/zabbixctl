@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 	"text/tabwriter"
 
@@ -11,18 +10,26 @@ import (
 	"github.com/zazab/hierr"
 )
 
-func handleModeTriggers(
+func handleTriggers(
 	zabbix *Zabbix,
 	config *Config,
 	args map[string]interface{},
 ) error {
 	var (
-		acknowledge  = args["--acknowledge"].(bool)
-		confirmation = !args["--noconfirm"].(bool)
+		acknowledge    = args["--acknowledge"].(bool)
+		words, pattern = parseSearchQuery(args["<pattern>"].([]string))
+		confirmation   = !args["--noconfirm"].(bool)
 
-		pattern = getFuzzyPattern(args["<search>"].([]string))
-		table   = tabwriter.NewWriter(os.Stdout, 1, 4, 2, ' ', 0)
+		table = tabwriter.NewWriter(os.Stdout, 1, 4, 2, ' ', 0)
 	)
+
+	if len(words) > 0 {
+		return fmt.Errorf(
+			"unexpected command line token '%s', "+
+				"use '/%s' for searching triggers",
+			words[0], words[0],
+		)
+	}
 
 	params, err := parseParams(args)
 	if err != nil {
@@ -39,18 +46,13 @@ func handleModeTriggers(
 
 	debugln("* showing triggers table")
 	if pattern != "" {
-		debugf("** %s", pattern)
+		debugf("** searching %s", pattern)
 	}
 
 	identifiers := []string{}
 	for _, trigger := range triggers {
-		if pattern != "" {
-			matched, _ := regexp.MatchString(
-				pattern, strings.ToLower(trigger.String()),
-			)
-			if !matched {
-				continue
-			}
+		if pattern != "" && !matchPattern(pattern, trigger.String()) {
+			continue
 		}
 
 		fmt.Fprintf(
@@ -153,21 +155,4 @@ func confirmAcknowledge() bool {
 	fmt.Fprintf(os.Stderr, "\n:: Proceed with acknowledge? [Y/n]: ")
 	fmt.Scanln(&value)
 	return value == "" || value == "Y" || value == "y"
-}
-
-func getFuzzyPattern(query []string) string {
-	letters := strings.Split(
-		strings.Replace(
-			strings.Join(query, ""),
-			" ", "", -1,
-		),
-		"",
-	)
-	for i, letter := range letters {
-		letters[i] = regexp.QuoteMeta(letter)
-	}
-
-	pattern := strings.ToLower(strings.Join(letters, ".*"))
-
-	return pattern
 }
