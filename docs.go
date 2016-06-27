@@ -3,7 +3,7 @@ package main
 import "os"
 
 var (
-	version = "3.0"
+	version = "manual build"
 	docs    = `zabbixctl ` + version + os.ExpandEnv(`
 
   zabbixctl is tool for working with zabbix server api using command line
