@@ -57,9 +57,8 @@ build() {
 
 	git submodule update --init
 
-	go get -v \
-		-gcflags "-trimpath $GOPATH/src" \
-		-ldflags="-X main.version=$pkgver-$pkgrel"
+    echo ":: Building..."
+    make build
 }
 
 package() {
