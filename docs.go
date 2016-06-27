@@ -3,12 +3,12 @@ package main
 import "os"
 
 var (
-	version = "2.0"
+	version = "3.0"
 	docs    = `zabbixctl ` + version + os.ExpandEnv(`
 
   zabbixctl is tool for working with zabbix server api using command line
-interface, it provides effective way for operating on statuses of triggers and
-hosts latest data.
+interface, it provides effective way for operating on statuses of triggers,
+hosts latest data and groups of users.
 
   zabbixctl must be configurated before using, configuration file should be
 placed in ~/.config/zabbixctl.conf and must be written using following syntax:
@@ -31,6 +31,7 @@ session file.
 Usage:
   zabbixctl [options] -T [/<pattern>...]
   zabbixctl [options] -L <hostname>... [/<pattern>...]
+  zabbixctl [options] -G [/<pattern>...]
   zabbixctl -h | --help
   zabbixctl --version
 
@@ -113,7 +114,8 @@ Misc options:
     Use specified configuration file.
     [default: $HOME/.config/zabbixctl.conf]
 
-  -v --verbosity        Specify program output verbosity.
+  -v --verbosity
+    Specify program output verbosity.
     Once for debug, twice for trace.
 
   -h --help

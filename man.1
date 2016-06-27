@@ -1,0 +1,304 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "ZABBIXCTL" "1" "June 2016" "" ""
+.
+.SH "NAME"
+\fBzabbixctl\fR \- tool for working with zabbix using command line interface
+.
+.SH "DESCRIPTIOPN"
+\fIzabbixctl\fR is tool for working with zabbix server api using command line interface, it provides effective way for operating on statuses of triggers, hosts latest data and groups of users\.
+.
+.SH "CONFIGURATION"
+\fIzabbixctl\fR must be configurated before using, configuration file should be placed in \fB~/\.config/zabbixctl\.conf\fR and must be written using following syntax:
+.
+.IP "" 4
+.
+.nf
+
+[server]
+  address  = "zabbix\.local"
+  username = "admin"
+  password = "password"
+
+[session]
+  path = "~/\.cache/zabbixctl\.session"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIzabbixctl\fR will authorize in \'zabbix\.local\' server using given user credentials and save a zabbix session to a file \fB~/\.cache/zabbixctl\.session\fR and at second run will use saved session instead of new authorization, by the way zabbix sessions have a ttl that by default equals to 15 minutes, so if saved zabbix session is outdated, \fIzabbixctl\fR will repeat authorization and rewrite the session file\.
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+zabbixctl [options] \-T [/<pattern>\.\.\.]
+zabbixctl [options] \-L <hostname>\.\.\. [/<pattern>\.\.\.]
+zabbixctl [options] \-G [/<pattern>\.\.\.]
+zabbixctl \-h | \-\-help
+zabbixctl \-\-version
+.
+.fi
+.
+.SH "OPTIONS"
+\fB\-T \-\-triggers\fR
+.
+.P
+Search on zabbix triggers statuses\. Triggers could be filtered using /\fIpattern\fR argument, for example, search and acknowledge all triggers in a problem state and match the word \'cache\':
+.
+.P
+\fBzabbixctl \-Tp /cache\fR
+.
+.P
+\fB\-k \-\-only\-nack\fR
+.
+.P
+Show only not acknowledged triggers\.
+.
+.P
+\fB\-x \-\-severity\fR
+.
+.P
+Specify minimum trigger severity\. Once for information, twice for warning, three for disaster, four for high, five for disaster\.
+.
+.P
+\fB\-p \-\-problem\fR
+.
+.P
+Show triggers that have a problem state\.
+.
+.P
+\fB\-r \-\-recent\fR
+.
+.P
+Show triggers that have recently been in a problem state\.
+.
+.P
+\fB\-s \-\-since \fIdate\fR\fR
+.
+.P
+Show triggers that have changed their state after the given time, default: 7 days ago\.
+.
+.P
+\fB\-u \-\-until \fIdate\fR\fR
+.
+.P
+Show triggers that have changed their state before the given time\.
+.
+.P
+\fB\-m \-\-maintenance\fR
+.
+.P
+Show hosts in maintenance\.
+.
+.P
+\fB\-i \-\-sort \fIfields\fR\fR
+.
+.P
+Show triggers sorted by specified fields, default: lastchange,priority\.
+.
+.P
+\fB\-o \-\-order \fIorder\fR\fR
+.
+.P
+Show triggers in specified order, default: DESC\.
+.
+.P
+\fB\-n \-\-limit \fIamount\fR\fR
+.
+.P
+Show specified amount of triggers\.
+.
+.P
+\fB\-k \-\-acknowledge\fR
+.
+.P
+Acknowledge all retrieved triggers\.
+.
+.P
+\fB\-f \-\-noconfirm\fR
+.
+.P
+Do not prompt acknowledge confirmation dialog\.
+.
+.P
+\fB\-L \-\-latest\-data\fR
+.
+.P
+Search and show latest data for specified host(s)\. Hosts can be searched using wildcard character \'*\'\. Latest data can be filtered using /\fIpattern\fR argument, for example retrieve latest data for database nodes and search information about replication:
+.
+.P
+\fBzabbixctl \-L dbnode\-* /replication\fR
+.
+.P
+\fB\-g \-\-graph\fR
+.
+.P
+Show links on graph pages\.
+.
+.P
+\fB\-G \-\-groups\fR
+.
+.P
+Search and operate on configuration of users groups\.
+.
+.P
+\fB\-l \-\-list\fR
+.
+.P
+Show list users in specified users group\.
+.
+.P
+\fB\-a \-\-add\fR
+.
+.P
+Add specified \fIuser\fR to specified users group\.
+.
+.P
+\fB\-r \-\-remove\fR
+.
+.P
+Remove specified \fIuser\fR from speicifed users group\.
+.
+.P
+\fB\-f \-\-noconfirm\fR
+.
+.P
+Do not prompt confirmation dialog\.
+.
+.SH "COMMON OPTIONS"
+\fB\-c \-\-config \fIpath\fR\fR
+.
+.P
+Use specified configuration file, default: \fB$HOME/\.config/zabbixctl\.conf\fR
+.
+.P
+\fB\-v \-\-verbosity\fR
+.
+.P
+Specify program output verbosity\. Once for debug, twice for trace\.
+.
+.P
+\fB\-h \-\-help\fR
+.
+.P
+Show this screen\.
+.
+.P
+\fB\-\-version\fR
+.
+.P
+Show version\.
+.
+.SH "EXAMPLES"
+\fIListing triggers in a problem state\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctlp \-Tp
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIListing triggers that have recenty been in a problem state\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctlp \-Tr
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIListing and filtering triggers that contain a word mysql\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctlp \-T /mysql
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIListing and acknowledging triggers that severity level is DISASTER\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctl \-T \-xxxxx \-k
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIListing latest data for db nodes and filtering for information about replication lag\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctl \-L dbnode* /lag
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIListing users groups that starts with \'HTTP_\'\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctl \-G HTTP_*
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIListing users groups that contain user admin\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctl \-G /admin
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIAdding user admin to groups that contain user guest\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctl \-G /guest \-a admin
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Egor Kovetskiy \fIe\.kovetskiy@gmail\.com\fR
+.
+.P
+GitHub \fIhttps://github\.com/kovetskiy/zabbixctl\fR
