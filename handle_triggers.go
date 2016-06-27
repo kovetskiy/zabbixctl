@@ -36,7 +36,15 @@ func handleTriggers(
 		return err
 	}
 
-	triggers, err := zabbix.GetTriggers(params)
+	var triggers []Trigger
+
+	err = withSpinner(
+		":: Requesting information about statuses of triggers",
+		func() error {
+			triggers, err = zabbix.GetTriggers(params)
+			return err
+		},
+	)
 	if err != nil {
 		return hierr.Errorf(
 			err,
@@ -84,9 +92,19 @@ func handleTriggers(
 		}
 	}
 
-	err = zabbix.Acknowledge(identifiers)
+	err = withSpinner(
+		":: Acknowledging specified triggers",
+		func() error {
+			return zabbix.Acknowledge(identifiers)
+		},
+	)
+
 	if err != nil {
-		return err
+		return hierr.Errorf(
+			err,
+			"can't acknowledge triggers %s",
+			identifiers,
+		)
 	}
 
 	fmt.Fprintln(os.Stderr, ":: Acknowledged")

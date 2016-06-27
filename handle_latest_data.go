@@ -24,21 +24,29 @@ func handleLatestData(
 		return errors.New("no hostname specified")
 	}
 
-	hosts, err := zabbix.GetHosts(
-		Params{
-			"monitored_hosts":         "1",
-			"with_items":              "1",
-			"with_monitored_items":    "1",
-			"with_monitored_triggers": "1",
-			"search": Params{
-				"name": hostnames,
-			},
-			"searchWildcardsEnabled": "1",
-			"output": []string{
-				"host",
-			},
+	var hosts []Host
+	var err error
+
+	err = withSpinner(
+		":: Requesting information about hosts",
+		func() error {
+			hosts, err = zabbix.GetHosts(Params{
+				"monitored_hosts":         "1",
+				"with_items":              "1",
+				"with_monitored_items":    "1",
+				"with_monitored_triggers": "1",
+				"search": Params{
+					"name": hostnames,
+				},
+				"searchWildcardsEnabled": "1",
+				"output": []string{
+					"host",
+				},
+			})
+			return err
 		},
 	)
+
 	if err != nil {
 		return hierr.Errorf(
 			err,
@@ -62,7 +70,14 @@ func handleLatestData(
 		"hostids": identifiers,
 	}
 
-	items, err := zabbix.GetItems(params)
+	var items []Item
+	err = withSpinner(
+		":: Requesting information about hosts items",
+		func() error {
+			items, err = zabbix.GetItems(params)
+			return err
+		},
+	)
 	if err != nil {
 		return hierr.Errorf(
 			err,

@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 import "github.com/kovetskiy/lorg"
+import "github.com/kovetskiy/spinner-go"
 import "os"
 
 func getLogger() *lorg.Log {
@@ -12,13 +13,16 @@ func getLogger() *lorg.Log {
 }
 
 func fatalf(format string, values ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, values...)
+	if spinner.IsActive() {
+		spinner.Stop()
+	}
+
+	fmt.Fprintf(os.Stderr, format+"\n", values...)
 	os.Exit(1)
 }
 
 func fatalln(value interface{}) {
-	fmt.Fprintln(os.Stderr, value)
-	os.Exit(1)
+	fatalf("%s", value)
 }
 
 func debugf(format string, values ...interface{}) {
@@ -30,9 +34,9 @@ func tracef(format string, values ...interface{}) {
 }
 
 func debugln(value interface{}) {
-	logger.Debug(value)
+	debugf("%s", value)
 }
 
 func traceln(value interface{}) {
-	logger.Trace(value)
+	tracef("%s", value)
 }

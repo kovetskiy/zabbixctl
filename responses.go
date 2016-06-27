@@ -45,3 +45,13 @@ type ResponseHosts struct {
 	ResponseRaw
 	Data []Host `json:"result"`
 }
+
+type ResponseUserGroup struct {
+	ResponseRaw
+	Data []UserGroup `json:"result"`
+}
+
+type ResponseUsers struct {
+	ResponseRaw
+	Data []User `json:"result"`
+}

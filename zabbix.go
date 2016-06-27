@@ -223,6 +223,92 @@ func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 	return response.Data, nil
 }
 
+func (zabbix *Zabbix) GetUsersGroups(params Params) ([]UserGroup, error) {
+	debugln("* retrieving users groups list")
+
+	var response ResponseUserGroup
+	err := zabbix.call("usergroup.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Data, nil
+}
+
+func (zabbix *Zabbix) AddUserToGroups(
+	groups []UserGroup,
+	user User,
+) error {
+	for _, group := range groups {
+		identifiers := []string{user.ID}
+
+		for _, groupUser := range group.Users {
+			identifiers = append(identifiers, groupUser.ID)
+		}
+
+		debugf("* adding user %s to group %s", user.Alias, group.Name)
+
+		err := zabbix.call(
+			"usergroup.update",
+			Params{"usrgrpid": group.ID, "userids": identifiers},
+			&ResponseRaw{},
+		)
+		if err != nil {
+			return hierr.Errorf(
+				err,
+				"can't update usergroup %s", group.Name,
+			)
+		}
+	}
+
+	return nil
+}
+
+func (zabbix *Zabbix) RemoveUserFromGroups(
+	groups []UserGroup,
+	user User,
+) error {
+	for _, group := range groups {
+		identifiers := []string{}
+
+		for _, groupUser := range group.Users {
+			if groupUser.ID == user.ID {
+				continue
+			}
+
+			identifiers = append(identifiers, groupUser.ID)
+		}
+
+		debugf("* removing user %s from group %s", user.Alias, group.Name)
+
+		err := zabbix.call(
+			"usergroup.update",
+			Params{"usrgrpid": group.ID, "userids": identifiers},
+			&ResponseRaw{},
+		)
+		if err != nil {
+			return hierr.Errorf(
+				err,
+				"can't update usergroup %s", group.Name,
+			)
+		}
+	}
+
+	return nil
+}
+
+func (zabbix *Zabbix) GetUsers(params Params) ([]User, error) {
+	debugln("* retrieving users list")
+
+	var response ResponseUsers
+	err := zabbix.call("user.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Data, nil
+}
+
 func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
 	debugf("* retrieving hosts list")
 
