@@ -65,4 +65,8 @@ package() {
 	find "$srcdir/.go/bin/" -type f -executable | while read filename; do
 		install -DT "$filename" "$pkgdir/usr/bin/$(basename $filename)"
 	done
+
+    install -DT \
+        "$srcdir/$pkgname/man.1" \
+        "$pkgdir/usr/share/man/man1/zabbixctl.1"
 }
