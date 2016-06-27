@@ -57,6 +57,9 @@ build() {
 
 	git submodule update --init
 
+    echo ":: Dependencies"
+    go get -v
+
     echo ":: Building..."
     make build
 }
