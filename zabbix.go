@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -17,6 +19,10 @@ import (
 const (
 	// 900 is default zabbix session ttl, -60 for safety
 	ZabbixSessionTTL = 900 - 60
+)
+
+var (
+	reItemKeyParams = regexp.MustCompile(`\[([^\]]+)\]`)
 )
 
 type Params map[string]interface{}
@@ -220,7 +226,14 @@ func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 		return nil, err
 	}
 
-	return response.Data, nil
+	result := make([]Item, len(response.Data))
+	for i, item := range response.Data {
+		item.Name = expandKeyArgumentsInName(item.Name, item.Key)
+
+		result[i] = item
+	}
+
+	return result, nil
 }
 
 func (zabbix *Zabbix) GetUsersGroups(params Params) ([]UserGroup, error) {
@@ -451,4 +464,18 @@ func unshuffle(target interface{}) []interface{} {
 	}
 
 	return values
+}
+
+func expandKeyArgumentsInName(name string, key string) string {
+	match := reItemKeyParams.FindStringSubmatch(key)
+	if len(match) == 0 {
+		return name
+	}
+
+	args := strings.Split(match[1], ",")
+	for index, arg := range args {
+		name = strings.Replace(name, fmt.Sprintf(`$%d`, index+1), arg, -1)
+	}
+
+	return name
 }

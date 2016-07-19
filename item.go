@@ -11,6 +11,7 @@ type Item struct {
 	Name       string `json:"name"`
 	LastValue  string `json:"lastvalue"`
 	LastChange string `json:"lastclock"`
+	Key        string `json:"key_"`
 }
 
 func (item *Item) DateTime() string {
