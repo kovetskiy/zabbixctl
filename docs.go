@@ -98,6 +98,12 @@ Workflow options:
     -g --graph
       Show links on graph pages.
 
+    --stacked
+      Output single link for the stacked graph of selected data.
+
+    --normal
+      Output single link for the normal (overlapping) graph of selected data.
+
   -G --groups
     Search and operate on configuration of users groups.
 
@@ -156,7 +162,8 @@ Options:
     -d --extended
   -L --latest-data
     -g --graph
-    -d --extended
+    --stacked
+    --normal
   -G --groups
     -a --add <user>
     -r --remove <user>

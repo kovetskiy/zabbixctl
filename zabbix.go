@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -323,8 +324,37 @@ func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
 }
 
 func (zabbix *Zabbix) GetGraphURL(identifier string) string {
-	return zabbix.basicURL +
-		"/history.php?action=showgraph&itemids%5B%5D=" + identifier
+	return zabbix.getGraphURL([]string{identifier}, "showgraph", "0")
+}
+
+func (zabbix *Zabbix) GetNormalGraphURL(identifiers []string) string {
+	return zabbix.getGraphURL(identifiers, "batchgraph", "0")
+}
+
+func (zabbix *Zabbix) GetStackedGraphURL(identifiers []string) string {
+	return zabbix.getGraphURL(identifiers, "batchgraph", "1")
+}
+
+func (zabbix *Zabbix) getGraphURL(
+	identifiers []string,
+	action string,
+	graphType string,
+) string {
+	encodedIdentifiers := []string{}
+
+	for _, identifier := range identifiers {
+		encodedIdentifiers = append(
+			encodedIdentifiers,
+			"itemids%5B%5D="+identifier,
+		)
+	}
+
+	return zabbix.basicURL + fmt.Sprintf(
+		"/history.php?action=%s&graphtype=%s&%s",
+		action,
+		graphType,
+		strings.Join(encodedIdentifiers, "&"),
+	)
 }
 
 func (zabbix *Zabbix) GetHistory(extend Params) ([]History, error) {
