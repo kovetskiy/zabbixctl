@@ -335,7 +335,8 @@ func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
 }
 
 func (zabbix *Zabbix) GetGraphURL(identifier string) string {
-	return zabbix.basicURL + "/history.php?action=showgraph&itemids[]=" + identifier
+	return zabbix.basicURL +
+		"/history.php?action=showgraph&itemids%5B%5D=" + identifier
 }
 
 func (zabbix *Zabbix) call(
