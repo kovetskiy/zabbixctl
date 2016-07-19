@@ -10,6 +10,15 @@ import (
 	"github.com/zazab/hierr"
 )
 
+type ExtendedOutput int
+
+const (
+	ExtendedOutputNone ExtendedOutput = iota
+	ExtendedOutputValue
+	ExtendedOutputDate
+	ExtendedOutputAll
+)
+
 func handleTriggers(
 	zabbix *Zabbix,
 	config *Config,
@@ -19,6 +28,7 @@ func handleTriggers(
 		acknowledge    = args["--acknowledge"].(bool)
 		words, pattern = parseSearchQuery(args["<pattern>"].([]string))
 		confirmation   = !args["--noconfirm"].(bool)
+		extended       = ExtendedOutput(args["--extended"].(int))
 
 		table = tabwriter.NewWriter(os.Stdout, 1, 4, 2, ' ', 0)
 	)
@@ -52,6 +62,18 @@ func handleTriggers(
 		)
 	}
 
+	var history = make(map[string]ItemHistory)
+
+	if extended != ExtendedOutputNone {
+		history, err = getTriggerItemsHistory(zabbix, triggers)
+		if err != nil {
+			return hierr.Errorf(
+				err,
+				`can't obtain history for items of triggers`,
+			)
+		}
+	}
+
 	debugln("* showing triggers table")
 	if pattern != "" {
 		debugf("** searching %s", pattern)
@@ -65,7 +87,7 @@ func handleTriggers(
 
 		fmt.Fprintf(
 			table,
-			"%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			"%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			trigger.LastEvent.ID, trigger.DateTime(),
 			trigger.Severity(),
 			trigger.StatusProblem(),
@@ -73,6 +95,24 @@ func handleTriggers(
 			trigger.Hostname,
 			trigger.Description,
 		)
+
+		if len(trigger.Functions) > 0 {
+			if last, ok := history[trigger.Functions[0].ItemID]; ok {
+				if extended >= ExtendedOutputValue {
+					fmt.Fprintf(table, "\t%s", last.History.String())
+				}
+
+				if extended >= ExtendedOutputDate {
+					fmt.Fprintf(table, "\t%s", last.History.DateTime())
+				}
+
+				if extended >= ExtendedOutputAll {
+					fmt.Fprintf(table, "\t%s", last.Item.Format())
+				}
+			}
+		}
+
+		fmt.Fprint(table, "\n")
 
 		identifiers = append(identifiers, trigger.LastEvent.ID)
 	}
@@ -110,6 +150,59 @@ func handleTriggers(
 	fmt.Fprintln(os.Stderr, ":: Acknowledged")
 
 	return nil
+}
+
+func getTriggerItemsHistory(
+	zabbix *Zabbix,
+	triggers []Trigger,
+) (map[string]ItemHistory, error) {
+	history := map[string]ItemHistory{}
+
+	itemIDs := []string{}
+	for _, trigger := range triggers {
+		if len(trigger.Functions) > 0 {
+			itemIDs = append(itemIDs, trigger.Functions[0].ItemID)
+		}
+	}
+
+	items, err := zabbix.GetItems(Params{
+		"itemids": itemIDs,
+	})
+	if err != nil {
+		return nil, hierr.Errorf(
+			err,
+			`can't obtain items of triggers`,
+		)
+	}
+
+	err = withSpinner(
+		":: Requesting history for items of triggers",
+		func() error {
+			for _, item := range items {
+				lastValues, err := zabbix.GetHistory(Params{
+					"history": item.ValueType,
+					"itemids": item.ID,
+					"limit":   1,
+				})
+				if err != nil {
+					return err
+				}
+
+				if len(lastValues) == 0 {
+					continue
+				}
+
+				history[item.ID] = ItemHistory{
+					Item:    item,
+					History: lastValues[0],
+				}
+			}
+
+			return nil
+		},
+	)
+
+	return history, err
 }
 
 func parseParams(args map[string]interface{}) (Params, error) {

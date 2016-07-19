@@ -88,7 +88,7 @@ func handleLatestData(
 	for _, item := range items {
 		line := fmt.Sprintf(
 			"%s\t%s\t%s\t%-10s",
-			hash[item.HostID].Name, item.Name,
+			hash[item.HostID].Name, item.Format(),
 			item.DateTime(), item.LastValue,
 		)
 

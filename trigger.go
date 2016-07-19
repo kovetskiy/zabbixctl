@@ -7,11 +7,13 @@ import (
 )
 
 type Trigger struct {
-	ID          string `json:"triggerid"`
-	Description string `json:"description"`
-	Hostname    string `json:"host"`
-	Value       string `json:"value"`
-	LastChange  string `json:"lastchange"`
+	ID          string     `json:"triggerid"`
+	Description string     `json:"description"`
+	Hostname    string     `json:"host"`
+	Value       string     `json:"value"`
+	Comments    string     `json:"comments"`
+	Functions   []Function `json:"functions"`
+	LastChange  string     `json:"lastchange"`
 	LastEvent   struct {
 		ID           string `json:"eventid"`
 		Acknowledged string `json:"acknowledged"`

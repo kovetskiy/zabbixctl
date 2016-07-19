@@ -3,12 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"reflect"
-	"regexp"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -19,10 +17,6 @@ import (
 const (
 	// 900 is default zabbix session ttl, -60 for safety
 	ZabbixSessionTTL = 900 - 60
-)
-
-var (
-	reItemKeyParams = regexp.MustCompile(`\[([^\]]+)\]`)
 )
 
 type Params map[string]interface{}
@@ -192,6 +186,7 @@ func (zabbix *Zabbix) GetTriggers(extend Params) ([]Trigger, error) {
 		"selectHosts":       []string{"name"},
 		"selectGroups":      []string{"groupid", "name"},
 		"selectLastEvent":   "extend",
+		"selectFunctions":   "extend",
 		"expandExpression":  true,
 		"expandData":        true,
 		"expandDescription": true,
@@ -226,14 +221,7 @@ func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 		return nil, err
 	}
 
-	result := make([]Item, len(response.Data))
-	for i, item := range response.Data {
-		item.Name = expandKeyArgumentsInName(item.Name, item.Key)
-
-		result[i] = item
-	}
-
-	return result, nil
+	return response.Data, nil
 }
 
 func (zabbix *Zabbix) GetUsersGroups(params Params) ([]UserGroup, error) {
@@ -337,6 +325,28 @@ func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
 func (zabbix *Zabbix) GetGraphURL(identifier string) string {
 	return zabbix.basicURL +
 		"/history.php?action=showgraph&itemids%5B%5D=" + identifier
+}
+
+func (zabbix *Zabbix) GetHistory(extend Params) ([]History, error) {
+	debugf("* retrieving items history")
+
+	params := Params{
+		"output":    "extend",
+		"sortfield": "clock",
+		"sortorder": "DESC",
+	}
+
+	for key, value := range extend {
+		params[key] = value
+	}
+
+	var response ResponseHistory
+	err := zabbix.call("history.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Data, nil
 }
 
 func (zabbix *Zabbix) call(
@@ -465,18 +475,4 @@ func unshuffle(target interface{}) []interface{} {
 	}
 
 	return values
-}
-
-func expandKeyArgumentsInName(name string, key string) string {
-	match := reItemKeyParams.FindStringSubmatch(key)
-	if len(match) == 0 {
-		return name
-	}
-
-	args := strings.Split(match[1], ",")
-	for index, arg := range args {
-		name = strings.Replace(name, fmt.Sprintf(`$%d`, index+1), arg, -1)
-	}
-
-	return name
 }
