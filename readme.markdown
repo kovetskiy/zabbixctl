@@ -111,7 +111,7 @@ Remove specified <user> from speicifed users group.
 ##### -f --noconfirm
 Do not prompt confirmation dialog.
 
-##### --stacked | --normal
+##### -w --stacked | -b --normal
 Returns single link which points to the stacked or normal graph for matched
 items.
 

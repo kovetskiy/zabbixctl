@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ZABBIXCTL" "1" "June 2016" "" ""
+.TH "ZABBIXCTL" "1" "July 2016" "" ""
 .
 .SH "NAME"
 \fBzabbixctl\fR \- tool for working with zabbix using command line interface
@@ -200,7 +200,7 @@ Show version\.
 .
 .nf
 
-zabbixctlp \-Tp
+zabbixctl \-Tp
 .
 .fi
 .
@@ -213,7 +213,7 @@ zabbixctlp \-Tp
 .
 .nf
 
-zabbixctlp \-Tr
+zabbixctl \-Tr
 .
 .fi
 .
@@ -226,7 +226,7 @@ zabbixctlp \-Tr
 .
 .nf
 
-zabbixctlp \-T /mysql
+zabbixctl \-T /mysql
 .
 .fi
 .
@@ -253,6 +253,19 @@ zabbixctl \-T \-xxxxx \-k
 .nf
 
 zabbixctl \-L dbnode* /lag
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fIOpening stacked graph for CPU quote use of selected containers\fR
+.
+.IP "" 4
+.
+.nf
+
+zabbixctl \-L \'container\-*\' /cpu quota \-\-stacked
 .
 .fi
 .
@@ -299,6 +312,9 @@ zabbixctl \-G /guest \-a admin
 .
 .SH "AUTHOR"
 Egor Kovetskiy \fIe\.kovetskiy@gmail\.com\fR
+.
+.SH "CONTRIBUTORS"
+Stanislav Seletskiy \fIs\.seletskiy@gmail\.com\fR
 .
 .P
 GitHub \fIhttps://github\.com/kovetskiy/zabbixctl\fR

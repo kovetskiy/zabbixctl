@@ -151,19 +151,19 @@ Show version.
 *Listing triggers in a problem state*
 
 ```
-zabbixctlp -Tp
+zabbixctl -Tp
 ```
 
 *Listing triggers that have recenty been in a problem state*
 
 ```
-zabbixctlp -Tr
+zabbixctl -Tr
 ```
 
 *Listing and filtering triggers that contain a word mysql*
 
 ```
-zabbixctlp -T /mysql
+zabbixctl -T /mysql
 ```
 
 *Listing and acknowledging triggers that severity level is DISASTER*
@@ -176,6 +176,12 @@ zabbixctl -T -xxxxx -k
 
 ```
 zabbixctl -L dbnode* /lag
+```
+
+*Opening stacked graph for CPU quote use of selected containers*
+
+```
+zabbixctl -L 'container-*' /cpu quota --stacked
 ```
 
 *Listing users groups that starts with 'HTTP_'*
@@ -199,5 +205,9 @@ zabbixctl -G /guest -a admin
 ## AUTHOR
 
 Egor Kovetskiy <e.kovetskiy@gmail.com>
+
+## CONTRIBUTORS
+
+Stanislav Seletskiy <s.seletskiy@gmail.com>
 
 [GitHub](https://github.com/kovetskiy/zabbixctl)
