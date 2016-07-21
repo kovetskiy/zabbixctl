@@ -27,5 +27,9 @@ func (history *History) date() time.Time {
 }
 
 func (history *History) DateTime() string {
+	if history.Clock == "0" {
+		return "-"
+	}
+
 	return history.date().Format("2006-01-02 15:04:05")
 }
