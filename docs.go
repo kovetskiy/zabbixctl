@@ -101,7 +101,7 @@ Workflow options:
     -w --stacked
       Output single link for the stacked graph of selected data.
 
-    -j --normal
+    -b --normal
       Output single link for the normal (overlapping) graph of selected data.
 
   -G --groups
@@ -163,7 +163,7 @@ Options:
   -L --latest-data
     -g --graph
     -w --stacked
-    -j --normal
+    -b --normal
   -G --groups
     -a --add <user>
     -r --remove <user>
