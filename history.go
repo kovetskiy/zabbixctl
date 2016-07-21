@@ -13,8 +13,8 @@ type History struct {
 }
 
 type ItemHistory struct {
-	Item    Item
-	History History
+	Item
+	History
 }
 
 func (history *History) String() string {
