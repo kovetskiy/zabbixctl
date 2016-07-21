@@ -55,3 +55,8 @@ type ResponseUsers struct {
 	ResponseRaw
 	Data []User `json:"result"`
 }
+
+type ResponseHistory struct {
+	ResponseRaw
+	Data []History `json:"result"`
+}

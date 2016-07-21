@@ -17,6 +17,8 @@ func handleLatestData(
 	var (
 		hostnames, pattern = parseSearchQuery(args["<pattern>"].([]string))
 		graphs             = args["--graph"].(bool)
+		stackedGraph       = args["--stacked"].(bool)
+		normalGraph        = args["--normal"].(bool)
 		table              = tabwriter.NewWriter(os.Stdout, 1, 4, 2, ' ', 0)
 	)
 
@@ -85,10 +87,12 @@ func handleLatestData(
 		)
 	}
 
+	var matchedItemIDs = []string{}
+
 	for _, item := range items {
 		line := fmt.Sprintf(
 			"%s\t%s\t%s\t%-10s",
-			hash[item.HostID].Name, item.Name,
+			hash[item.HostID].Name, item.Format(),
 			item.DateTime(), item.LastValue,
 		)
 
@@ -96,14 +100,27 @@ func handleLatestData(
 			continue
 		}
 
+		fmt.Fprint(table, line)
+
 		if graphs {
-			line = line + " " + zabbix.GetGraphURL(item.ID)
+			fmt.Fprintf(table, "\t%s", zabbix.GetGraphURL(item.ID))
 		}
 
-		fmt.Fprintln(table, line)
+		fmt.Fprint(table, "\n")
+
+		matchedItemIDs = append(matchedItemIDs, item.ID)
 	}
 
-	table.Flush()
+	switch {
+	case stackedGraph:
+		fmt.Println(zabbix.GetStackedGraphURL(matchedItemIDs))
+
+	case normalGraph:
+		fmt.Println(zabbix.GetNormalGraphURL(matchedItemIDs))
+
+	default:
+		table.Flush()
+	}
 
 	return nil
 }

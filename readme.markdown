@@ -111,6 +111,10 @@ Remove specified <user> from speicifed users group.
 ##### -f --noconfirm
 Do not prompt confirmation dialog.
 
+##### -w --stacked | -b --normal
+Returns single link which points to the stacked or normal graph for matched
+items.
+
 ## Examples
 
 ### Listing triggers in a problem state
@@ -141,6 +145,12 @@ zabbixctl -T -xxxxx -k
 
 ```
 zabbixctl -L dbnode* /lag
+```
+
+### Opening stacked graph for CPU quote use of selected containers
+
+```
+zabbixctl -L 'container-*' /cpu quota --stacked
 ```
 
 ### Listing users groups that starts with 'HTTP_'

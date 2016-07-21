@@ -83,6 +83,11 @@ Workflow options:
     -f --noconfirm
       Do not prompt acknowledge confirmation dialog.
 
+    -d --extended
+      Once for printing item's last value from the first component of the
+      trigger expression. Twice for adding last value change date. Thrice for
+      printing item description as well.
+
   -L --latest-data
     Search and show latest data for specified host(s). Hosts can be searched
     using wildcard character '*'.  Latest data can be filtered using /<pattern>
@@ -92,6 +97,12 @@ Workflow options:
 
     -g --graph
       Show links on graph pages.
+
+    -w --stacked
+      Output single link for the stacked graph of selected data.
+
+    -b --normal
+      Output single link for the normal (overlapping) graph of selected data.
 
   -G --groups
     Search and operate on configuration of users groups.
@@ -125,7 +136,7 @@ Misc options:
     Show version.
 `)
 	usage = `
-  zabbixctl [options] -T [-v]... [-x]... [<pattern>]...
+  zabbixctl [options] -T [-v]... [-x]... [-d]... [<pattern>]...
   zabbixctl [options] -L [-v]... <pattern>...
   zabbixctl [options] -G [-v]... [<pattern>]...
   zabbixctl [options] -G [-v]... <pattern>... -a <user>
@@ -133,7 +144,7 @@ Misc options:
   zabbixctl -h | --help
   zabbixctl --version
 `
-	options = `
+    options = `
 Options:
   -T --triggers
     -y --only-nack
@@ -148,8 +159,11 @@ Options:
     -n --limit <amount>  [default: 0]
     -f --noconfirm
     -k --acknowledge
+    -d --extended
   -L --latest-data
     -g --graph
+    -w --stacked
+    -b --normal
   -G --groups
     -a --add <user>
     -r --remove <user>
