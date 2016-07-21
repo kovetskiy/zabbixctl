@@ -98,10 +98,10 @@ Workflow options:
     -g --graph
       Show links on graph pages.
 
-    --stacked
+    -w --stacked
       Output single link for the stacked graph of selected data.
 
-    --normal
+    -j --normal
       Output single link for the normal (overlapping) graph of selected data.
 
   -G --groups
@@ -144,7 +144,7 @@ Misc options:
   zabbixctl -h | --help
   zabbixctl --version
 `
-	options = `
+    options = `
 Options:
   -T --triggers
     -y --only-nack
@@ -162,8 +162,8 @@ Options:
     -d --extended
   -L --latest-data
     -g --graph
-    --stacked
-    --normal
+    -w --stacked
+    -j --normal
   -G --groups
     -a --add <user>
     -r --remove <user>
