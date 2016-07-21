@@ -185,7 +185,12 @@ func getTriggerItemsHistory(
 					"limit":   1,
 				})
 				if err != nil {
-					return err
+					return hierr.Errorf(
+						err,
+						`can't obtain history (type '%s') for item '%s'`,
+						item.ValueType,
+						item.ID,
+					)
 				}
 
 				if len(lastValues) == 0 {
