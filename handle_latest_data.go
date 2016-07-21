@@ -87,9 +87,8 @@ func handleLatestData(
 		)
 	}
 
-	var (
-		matchedItemIDs = make([]string, 0)
-	)
+	var matchedItemIDs = []string{}
+
 	for _, item := range items {
 		line := fmt.Sprintf(
 			"%s\t%s\t%s\t%-10s",
