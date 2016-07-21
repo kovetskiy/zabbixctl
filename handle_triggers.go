@@ -62,7 +62,7 @@ func handleTriggers(
 		)
 	}
 
-	var history = make(map[string]ItemHistory)
+	var history = map[string]ItemHistory{}
 
 	if extended != ExtendedOutputNone {
 		history, err = getTriggerItemsHistory(zabbix, triggers)
