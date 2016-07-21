@@ -6,12 +6,10 @@ import (
 	"time"
 )
 
-type HistoryValue interface{}
-
 type History struct {
-	ItemID string       `json:"itemid"`
-	Value  HistoryValue `json:"value"`
-	Clock  string       `json:"clock"`
+	ItemID string      `json:"itemid"`
+	Value  interface{} `json:"value"`
+	Clock  string      `json:"clock"`
 }
 
 type ItemHistory struct {
