@@ -4,6 +4,8 @@
 interface, it provides effective way for operating on statuses of triggers,
 hosts latest data and groups of users.
 
+![dashboard](http://i.imgur.com/0WZkMN0.gif)
+
 ## Installation
 
 ```
