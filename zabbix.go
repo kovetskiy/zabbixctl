@@ -18,6 +18,7 @@ import (
 const (
 	// 900 is default zabbix session ttl, -60 for safety
 	ZabbixSessionTTL = 900 - 60
+	ZabbixAPIURL     = "/api_jsonrpc.php"
 )
 
 type Params map[string]interface{}
@@ -52,7 +53,7 @@ func NewZabbix(
 	}
 
 	zabbix.basicURL = strings.TrimSuffix(address, "/")
-	zabbix.apiURL = zabbix.basicURL + "/api_jsonrpc.php"
+	zabbix.apiURL = zabbix.basicURL + ZabbixAPIURL
 
 	if sessionFile != "" {
 		debugln("* reading session file")
@@ -100,7 +101,7 @@ func NewZabbix(
 
 func (zabbix *Zabbix) restoreSession(path string) error {
 	file, err := os.OpenFile(
-		path, os.O_CREATE|os.O_RDWR, 0600,
+		path, os.O_RDONLY, 0600,
 	)
 	if err != nil {
 		return hierr.Errorf(
