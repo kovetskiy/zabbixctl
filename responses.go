@@ -41,6 +41,11 @@ type ResponseItems struct {
 	Data []Item `json:"result"`
 }
 
+type ResponseHTTPTests struct {
+	ResponseRaw
+	Data []HTTPTest `json:"result"`
+}
+
 type ResponseHosts struct {
 	ResponseRaw
 	Data []Host `json:"result"`
