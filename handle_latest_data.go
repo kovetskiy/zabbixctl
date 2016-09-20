@@ -68,42 +68,53 @@ func handleLatestData(
 
 	debugf("* hosts identifiers: %s", identifiers)
 
-	var items []Item
-	err = withSpinner(
-		":: Requesting information about hosts items",
-		func() error {
-			items, err = zabbix.GetItems(Params{
-				"hostids":  identifiers,
-				"webitems": "1",
-			})
+	var (
+		items     []Item
+		webchecks []HTTPTest
+	)
 
-			return err
+	err = withSpinner(
+		":: Requesting information about hosts items & web scenarios",
+		func() error {
+			errs := make(chan error, 0)
+
+			go func() {
+				var err error
+
+				items, err = zabbix.GetItems(Params{
+					"hostids":  identifiers,
+					"webitems": "1",
+				})
+
+				errs <- err
+			}()
+
+			go func() {
+				var err error
+
+				webchecks, err = zabbix.GetHTTPTests(Params{
+					"hostids":     identifiers,
+					"expandName":  "1",
+					"selectSteps": "extend",
+				})
+
+				errs <- err
+			}()
+
+			for _, err := range []error{<-errs, <-errs} {
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 	)
+
 	if err != nil {
 		return hierr.Errorf(
 			err,
 			"can't obtain zabbix items",
-		)
-	}
-
-	var webchecks []HTTPTest
-	err = withSpinner(
-		":: Requesting information about hosts web scenarios",
-		func() error {
-			webchecks, err = zabbix.GetHTTPTests(Params{
-				"hostids":     identifiers,
-				"expandName":  "1",
-				"selectSteps": "extend",
-			})
-
-			return err
-		},
-	)
-	if err != nil {
-		return hierr.Errorf(
-			err,
-			"can't obtain zabbix webchecks",
 		)
 	}
 

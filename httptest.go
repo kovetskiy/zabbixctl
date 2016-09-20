@@ -6,12 +6,15 @@ import (
 	"time"
 )
 
+// HTTPTestStep represents single step in the web scenario.
 type HTTPTestStep struct {
 	ID     string `json:"httpstepid"`
 	TestID string `json:"httptestid"`
 	URL    string `json:"url"`
 }
 
+// HTTPTest represents web scenario, which often used for simple step-by-step
+// external monitoring of websites via HTTP.
 type HTTPTest struct {
 	ID         string `json:"httptestid"`
 	HostID     string `json:"hostid"`

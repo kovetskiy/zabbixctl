@@ -226,7 +226,7 @@ func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 }
 
 func (zabbix *Zabbix) GetHTTPTests(params Params) ([]HTTPTest, error) {
-	debugln("* retrieving web checks list")
+	debugln("* retrieving web scenarios list")
 
 	var response ResponseHTTPTests
 	err := zabbix.call("httptest.get", params, &response)
