@@ -68,18 +68,49 @@ func handleLatestData(
 
 	debugf("* hosts identifiers: %s", identifiers)
 
-	params := Params{
-		"hostids": identifiers,
-	}
+	var (
+		items     []Item
+		webchecks []HTTPTest
+	)
 
-	var items []Item
 	err = withSpinner(
-		":: Requesting information about hosts items",
+		":: Requesting information about hosts items & web scenarios",
 		func() error {
-			items, err = zabbix.GetItems(params)
-			return err
+			errs := make(chan error, 0)
+
+			go func() {
+				var err error
+
+				items, err = zabbix.GetItems(Params{
+					"hostids":  identifiers,
+					"webitems": "1",
+				})
+
+				errs <- err
+			}()
+
+			go func() {
+				var err error
+
+				webchecks, err = zabbix.GetHTTPTests(Params{
+					"hostids":     identifiers,
+					"expandName":  "1",
+					"selectSteps": "extend",
+				})
+
+				errs <- err
+			}()
+
+			for err := range []error{<-errs, <-errs} {
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 	)
+
 	if err != nil {
 		return hierr.Errorf(
 			err,
@@ -91,8 +122,8 @@ func handleLatestData(
 
 	for _, item := range items {
 		line := fmt.Sprintf(
-			"%s\t%s\t%s\t%-10s",
-			hash[item.HostID].Name, item.Format(),
+			"%s\t%s\t%s\t%s\t%-10s",
+			hash[item.HostID].Name, item.Type.String(), item.Format(),
 			item.DateTime(), item.LastValue,
 		)
 
@@ -109,6 +140,19 @@ func handleLatestData(
 		fmt.Fprint(table, "\n")
 
 		matchedItemIDs = append(matchedItemIDs, item.ID)
+	}
+
+	for _, check := range webchecks {
+		line := fmt.Sprintf(
+			"%s\t%s\t%s",
+			hash[check.HostID].Name, `scenario`, check.Format(),
+		)
+
+		if pattern != "" && !matchPattern(pattern, line) {
+			continue
+		}
+
+		fmt.Fprintln(table, line)
 	}
 
 	switch {

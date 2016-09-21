@@ -13,13 +13,14 @@ var (
 )
 
 type Item struct {
-	ID         string `json:"itemid"`
-	HostID     string `json:"hostid"`
-	Name       string `json:"name"`
-	ValueType  string `json:"value_type"`
-	LastValue  string `json:"lastvalue"`
-	LastChange string `json:"lastclock"`
-	Key        string `json:"key_"`
+	ID         string   `json:"itemid"`
+	HostID     string   `json:"hostid"`
+	Name       string   `json:"name"`
+	ValueType  string   `json:"value_type"`
+	LastValue  string   `json:"lastvalue"`
+	LastChange string   `json:"lastclock"`
+	Key        string   `json:"key_"`
+	Type       ItemType `json:"type"`
 }
 
 func (item *Item) DateTime() string {

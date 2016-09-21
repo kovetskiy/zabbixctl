@@ -225,6 +225,18 @@ func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 	return response.Data, nil
 }
 
+func (zabbix *Zabbix) GetHTTPTests(params Params) ([]HTTPTest, error) {
+	debugln("* retrieving web scenarios list")
+
+	var response ResponseHTTPTests
+	err := zabbix.call("httptest.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Data, nil
+}
+
 func (zabbix *Zabbix) GetUsersGroups(params Params) ([]UserGroup, error) {
 	debugln("* retrieving users groups list")
 
