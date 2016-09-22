@@ -101,7 +101,7 @@ func handleLatestData(
 				errs <- err
 			}()
 
-			for err := range []error{<-errs, <-errs} {
+			for _, err := range []error{<-errs, <-errs} {
 				if err != nil {
 					return err
 				}
