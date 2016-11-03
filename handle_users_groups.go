@@ -103,7 +103,7 @@ func handleUsersGroups(
 
 	case removeUser != "":
 		if confirmation {
-			if !confirmAdding(removeUser) {
+			if !confirmRemoving(removeUser) {
 				return nil
 			}
 		}
