@@ -42,7 +42,7 @@ Workflow options:
     problem state and match the word 'cache':
       zabbixctl -Tp /cache
 
-    -k --only-nack
+    -y --only-nack
       Show only not acknowledged triggers.
 
     -x --severity
@@ -144,7 +144,7 @@ Misc options:
   zabbixctl -h | --help
   zabbixctl --version
 `
-    options = `
+	options = `
 Options:
   -T --triggers
     -y --only-nack

@@ -45,7 +45,7 @@ and match the word 'cache':
 
 `zabbixctl -Tp /cache`
 
-**-k --only-nack**
+**-y --only-nack**
 
 Show only not acknowledged triggers.
 
