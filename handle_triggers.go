@@ -92,7 +92,7 @@ func handleTriggers(
 			trigger.Severity(),
 			trigger.StatusProblem(),
 			trigger.StatusAcknowledge(),
-			trigger.Hostname,
+			trigger.GetHostName(),
 			trigger.Description,
 		)
 
