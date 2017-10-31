@@ -31,7 +31,10 @@ func (trigger *Trigger) String() string {
 }
 
 func (trigger *Trigger) GetHostName() string {
-	return trigger.Hosts[0].Name
+    if len(trigger.Hosts) > 0 {
+		return trigger.Hosts[0].Name
+    }
+    return "<missing>"
 }
 
 func (trigger *Trigger) StatusAcknowledge() string {
