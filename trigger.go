@@ -18,12 +18,23 @@ type Trigger struct {
 		ID           string `json:"eventid"`
 		Acknowledged string `json:"acknowledged"`
 	} `json:"lastEvent"`
+	Hosts []struct {
+		Hostid string `json:"hostid"`
+		Name   string `json:"name"`
+	} `json:"hosts"`
 	Priority string `json:"priority"`
 }
 
 func (trigger *Trigger) String() string {
 	return trigger.LastEvent.ID + " " +
 		trigger.Hostname + " " + trigger.Description
+}
+
+func (trigger *Trigger) GetHostName() string {
+    if len(trigger.Hosts) > 0 {
+		return trigger.Hosts[0].Name
+    }
+    return "<missing>"
 }
 
 func (trigger *Trigger) StatusAcknowledge() string {
