@@ -169,7 +169,10 @@ func (zabbix *Zabbix) Acknowledge(identifiers []string) error {
 
 	err := zabbix.call(
 		"event.acknowledge",
-		Params{"eventids": identifiers},
+		Params{
+			"eventids": identifiers,
+			"message":  "ack",
+		},
 		&response,
 	)
 	if err != nil {
