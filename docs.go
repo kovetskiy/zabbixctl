@@ -151,7 +151,7 @@ Options:
     -x --severity
     -p --problem
     -t --recent
-    -e --since <date>    [default: 7 days ago]
+    -s --since <date>    [default: 7 days ago]
     -u --until <date>
     -m --maintenance
     -i --sort <fields>   [default: lastchange,priority]
