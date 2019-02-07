@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/zazab/hierr"
+	"github.com/reconquest/karma-go"
 )
 
 const (
@@ -59,7 +59,7 @@ func NewZabbix(
 
 		err = zabbix.restoreSession(sessionFile)
 		if err != nil {
-			return nil, hierr.Errorf(
+			return nil, karma.Format(
 				err,
 				"can't restore zabbix session using file '%s'",
 				sessionFile,
@@ -72,7 +72,7 @@ func NewZabbix(
 	if zabbix.session == "" {
 		err = zabbix.Login(username, password)
 		if err != nil {
-			return nil, hierr.Errorf(
+			return nil, karma.Format(
 				err,
 				"can't authorize user '%s' in zabbix server",
 				username,
@@ -88,7 +88,7 @@ func NewZabbix(
 		// always rewrite session file, it will change modify date
 		err = zabbix.saveSession(sessionFile)
 		if err != nil {
-			return nil, hierr.Errorf(
+			return nil, karma.Format(
 				err,
 				"can't save zabbix session to file '%s'",
 			)
@@ -103,14 +103,14 @@ func (zabbix *Zabbix) restoreSession(path string) error {
 		path, os.O_CREATE|os.O_RDWR, 0600,
 	)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err, "can't open session file",
 		)
 	}
 
 	stat, err := file.Stat()
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err, "can't stat session file",
 		)
 	}
@@ -118,7 +118,7 @@ func (zabbix *Zabbix) restoreSession(path string) error {
 	if time.Now().Sub(stat.ModTime()).Seconds() < ZabbixSessionTTL {
 		session, err := ioutil.ReadAll(file)
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err, "can't read session file",
 			)
 		}
@@ -134,7 +134,7 @@ func (zabbix *Zabbix) restoreSession(path string) error {
 func (zabbix *Zabbix) saveSession(path string) error {
 	err := ioutil.WriteFile(path, []byte(zabbix.session), 0600)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't write session file",
 		)
@@ -271,7 +271,7 @@ func (zabbix *Zabbix) AddUserToGroups(
 			&ResponseRaw{},
 		)
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				"can't update usergroup %s", group.Name,
 			)
@@ -304,7 +304,7 @@ func (zabbix *Zabbix) RemoveUserFromGroups(
 			&ResponseRaw{},
 		)
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				"can't update usergroup %s", group.Name,
 			)
@@ -410,7 +410,7 @@ func (zabbix *Zabbix) call(
 
 	buffer, err := json.Marshal(request)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't encode request to JSON",
 		)
@@ -422,7 +422,7 @@ func (zabbix *Zabbix) call(
 		bytes.NewReader(buffer),
 	)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't create http request",
 		)
@@ -434,7 +434,7 @@ func (zabbix *Zabbix) call(
 
 	resource, err := zabbix.client.Do(payload)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"http request to zabbix api failed",
 		)
@@ -442,7 +442,7 @@ func (zabbix *Zabbix) call(
 
 	body, err := ioutil.ReadAll(resource.Body)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't read zabbix api response body",
 		)
@@ -479,7 +479,7 @@ func (zabbix *Zabbix) call(
 
 	err = response.Error()
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"zabbix returned error while working with api method %s",
 			method,

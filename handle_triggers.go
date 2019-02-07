@@ -6,8 +6,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/reconquest/karma-go"
 	"github.com/simplereach/timeutils"
-	"github.com/zazab/hierr"
 )
 
 type ExtendedOutput int
@@ -56,7 +56,7 @@ func handleTriggers(
 		},
 	)
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't obtain zabbix triggers",
 		)
@@ -67,7 +67,7 @@ func handleTriggers(
 	if extended != ExtendedOutputNone {
 		history, err = getTriggerItemsHistory(zabbix, triggers)
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				`can't obtain history for items of triggers`,
 			)
@@ -140,7 +140,7 @@ func handleTriggers(
 	)
 
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't acknowledge triggers %s",
 			identifiers,
@@ -169,7 +169,7 @@ func getTriggerItemsHistory(
 		"itemids": itemIDs,
 	})
 	if err != nil {
-		return nil, hierr.Errorf(
+		return nil, karma.Format(
 			err,
 			`can't obtain items of triggers`,
 		)
@@ -185,7 +185,7 @@ func getTriggerItemsHistory(
 					"limit":   1,
 				})
 				if err != nil {
-					return hierr.Errorf(
+					return karma.Format(
 						err,
 						`can't obtain history (type '%s') for item '%s'`,
 						item.ValueType,
@@ -260,7 +260,7 @@ func parseParams(args map[string]interface{}) (Params, error) {
 func parseDateTime(value string) (int64, error) {
 	date, err := timeutils.ParseDateString(value)
 	if err != nil {
-		return 0, hierr.Errorf(err, "can't parse datetime '%s'", value)
+		return 0, karma.Format(err, "can't parse datetime '%s'", value)
 	}
 
 	return date.Unix(), nil

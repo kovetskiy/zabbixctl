@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/zazab/hierr"
+	"github.com/reconquest/karma-go"
 )
 
 func handleUsersGroups(
@@ -37,7 +37,7 @@ func handleUsersGroups(
 	)
 
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't obtain users groups %s", groups,
 		)
@@ -80,7 +80,7 @@ func handleUsersGroups(
 
 		user, err := getUser(zabbix, addUser)
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				"can't obtain user '%s'", addUser,
 			)
@@ -94,7 +94,7 @@ func handleUsersGroups(
 		)
 
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				"can't add user '%s' to specified users groups",
 				user.Alias,
@@ -110,7 +110,7 @@ func handleUsersGroups(
 
 		user, err := getUser(zabbix, removeUser)
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				"can't obtain user '%s'", removeUser,
 			)
@@ -124,7 +124,7 @@ func handleUsersGroups(
 		)
 
 		if err != nil {
-			return hierr.Errorf(
+			return karma.Format(
 				err,
 				"can't remove user '%s' from specified users groups",
 				removeUser,
@@ -142,7 +142,7 @@ func getUser(zabbix *Zabbix, username string) (User, error) {
 		},
 	})
 	if err != nil {
-		return User{}, hierr.Errorf(
+		return User{}, karma.Format(
 			err, "can't obtain user with specified name",
 		)
 	}
@@ -172,7 +172,7 @@ func getUsersGroups(zabbix *Zabbix, groups []string) ([]UserGroup, error) {
 
 	usersgroups, err := zabbix.GetUsersGroups(params)
 	if err != nil {
-		return nil, hierr.Errorf(
+		return nil, karma.Format(
 			err,
 			"can't obtain zabbix users groups",
 		)
@@ -195,7 +195,7 @@ func getUsersGroups(zabbix *Zabbix, groups []string) ([]UserGroup, error) {
 		},
 	)
 	if err != nil {
-		return nil, hierr.Errorf(
+		return nil, karma.Format(
 			err,
 			"can't obtain users from specified groups %q",
 			usersIdentifiers,

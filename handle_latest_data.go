@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/zazab/hierr"
+	"github.com/reconquest/karma-go"
 )
 
 func handleLatestData(
@@ -50,7 +50,7 @@ func handleLatestData(
 	)
 
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't obtain zabbix hosts",
 		)
@@ -112,7 +112,7 @@ func handleLatestData(
 	)
 
 	if err != nil {
-		return hierr.Errorf(
+		return karma.Format(
 			err,
 			"can't obtain zabbix items",
 		)

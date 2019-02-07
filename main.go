@@ -6,7 +6,7 @@ import (
 	"github.com/kovetskiy/godocs"
 	"github.com/kovetskiy/lorg"
 	"github.com/kovetskiy/spinner-go"
-	"github.com/zazab/hierr"
+	"github.com/reconquest/karma-go"
 )
 
 var (
@@ -42,7 +42,7 @@ func main() {
 	config, err := NewConfig(args["--config"].(string))
 	if err != nil {
 		fatalln(
-			hierr.Errorf(
+			karma.Format(
 				err,
 				"problem with configuration",
 			),

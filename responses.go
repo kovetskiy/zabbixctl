@@ -1,6 +1,6 @@
 package main
 
-import "github.com/reconquest/hierr-go"
+import "github.com/reconquest/karma-go"
 
 type Response interface {
 	Error() error
@@ -17,7 +17,7 @@ type ResponseRaw struct {
 
 func (response *ResponseRaw) Error() error {
 	if response.Err.Data != "" && response.Err.Message != "" {
-		return hierr.Push(
+		return karma.Push(
 			response.Err.Message,
 			response.Err.Data,
 		)
