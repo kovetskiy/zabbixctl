@@ -210,4 +210,6 @@ Egor Kovetskiy <e.kovetskiy@gmail.com>
 
 Stanislav Seletskiy <s.seletskiy@gmail.com>
 
+Andrey Kitsul <a.kitsul@zarplata.ru>
+
 [GitHub](https://github.com/kovetskiy/zabbixctl)
