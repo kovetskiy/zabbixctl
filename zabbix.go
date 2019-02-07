@@ -91,6 +91,7 @@ func NewZabbix(
 			return nil, karma.Format(
 				err,
 				"can't save zabbix session to file '%s'",
+				sessionFile,
 			)
 		}
 	}
