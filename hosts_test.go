@@ -98,6 +98,19 @@ const (
     ],
     "id": 1
 }`
+
+	// https://www.zabbix.com/documentation/3.4/manual/api/reference/host/delete
+	hosts_remove = `
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "hostids": [
+            "13",
+            "32"
+        ]
+    },
+    "id": 1
+}`
 )
 
 func TestHostsGet(t *testing.T) {
@@ -123,4 +136,29 @@ func TestHostsGet(t *testing.T) {
 	test.Equal("Zabbix server", hosts[0].Name)
 	test.Equal("10167", hosts[1].ID)
 	test.Equal("Linux server", hosts[1].Name)
+}
+
+func TestHostsRemove(t *testing.T) {
+	test := assert.New(t)
+
+	testserver := httptest.NewServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprint(w, hosts_remove)
+		},
+	))
+	defer testserver.Close()
+
+	zabbix := &Zabbix{}
+	zabbix.client = testserver.Client()
+	zabbix.apiURL = testserver.URL
+
+	var hostids Hosts
+	payload := []string{"13", "32"}
+	hostids, err := zabbix.RemoveHosts(payload)
+
+	test.NoError(err)
+	test.Len(hostids.ID, 2)
+
+	test.Equal("13", hostids.ID[0])
+	test.Equal("32", hostids.ID[1])
 }

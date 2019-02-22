@@ -77,9 +77,7 @@ func handleMaintenances(
 				"can't obtain zabbix maintenances",
 			)
 		}
-		if len(maintenances) == 1 {
-			err = handleRemoveMaintenance(zabbix, config, args, maintenances)
-		}
+		err = handleRemoveMaintenance(zabbix, config, args, maintenances)
 
 	default:
 		err = handleListMaintenances(zabbix, config, args)
@@ -315,6 +313,12 @@ func handleRemoveMaintenance(
 	).Describe(
 		"name", removeMaintenance,
 	)
+
+	if len(maintenances) != 1 {
+		return destiny.Reason(
+			"can't remove more then one maintenance",
+		)
+	}
 
 	printMaintenancesTable(maintenances, pattern, extend)
 

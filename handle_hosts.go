@@ -30,8 +30,6 @@ func handleHosts(
 		if err != nil {
 			return destiny.Describe(
 				"error", err,
-			).Describe(
-				"hostname", removeHost,
 			).Reason(
 				"can't remove zabbix hosts",
 			)
@@ -76,6 +74,8 @@ func handleRemoveHosts(
 
 	destiny := karma.Describe(
 		"method", "removeHost",
+	).Describe(
+		"hostname", removeHost,
 	)
 
 	hosts, err = searchHosts(zabbix, removeHost)

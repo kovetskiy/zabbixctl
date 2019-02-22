@@ -127,7 +127,7 @@ Workflow options:
     search maintenance match the word 'update-kernel':
       zabbixctl -M dbnode-* /update-kernel
 
-    -a --add
+    -a --add <maintenance>
       Add new specified <maintenance> with timeperiod type once.
 
     --start <date>
@@ -143,7 +143,7 @@ Workflow options:
     -f --noconfirm
       Do not prompt confirmation dialog.
 
-    -r --remove
+    -r --remove <maintenance>
       Remove specified <maintenance>.
 
     -z --read-stdin
@@ -152,8 +152,8 @@ Workflow options:
   -H --hosts
     Search and operate with hosts.
 
-    -r --remove
-      Remove hosts.
+    -r --remove <hostname>
+      Remove specified <hostname>.
 
 
 Misc options:
