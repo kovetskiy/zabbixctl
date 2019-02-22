@@ -32,6 +32,8 @@ Usage:
   zabbixctl [options] -T [/<pattern>...]
   zabbixctl [options] -L <hostname>... [/<pattern>...]
   zabbixctl [options] -G [/<pattern>...]
+  zabbixctl [options] -M [<hostname>...] [/<pattern>...]
+  zabbixctl [options] -H [<pattern>] <hostname>
   zabbixctl -h | --help
   zabbixctl --version
 
@@ -119,6 +121,40 @@ Workflow options:
     -f --noconfirm
      Do not prompt confirmation dialog.
 
+  -M --maintenances
+    Search and operate on configuration of maintenance.
+    Maintenance could be filtered using /<pattern> argument, for example,
+    search maintenance match the word 'update-kernel':
+      zabbixctl -M dbnode-* /update-kernel
+
+    -a --add
+      Add new specified <maintenance> with timeperiod type once.
+
+    --start <date>
+      Start date 'yyyy-mm-dd HH:MM'. Default now.
+
+    --end <date>
+      Stop date 'yyyy-mm-dd HH:MM'. Default now + period.
+
+    --period <date>
+      Period in m/h/d (minutes/hours/days).
+      [default: 1d]
+
+    -f --noconfirm
+      Do not prompt confirmation dialog.
+
+    -r --remove
+      Remove specified <maintenance>.
+
+    -z --read-stdin
+      Read hosts from stdin.
+
+  -H --hosts
+    Search and operate with hosts.
+
+    -r --remove
+      Remove hosts.
+
 
 Misc options:
   -c --config <path>
@@ -141,6 +177,11 @@ Misc options:
   zabbixctl [options] -G [-v]... [<pattern>]...
   zabbixctl [options] -G [-v]... <pattern>... -a <user>
   zabbixctl [options] -G [-v]... <pattern>... -r <user>
+  zabbixctl [options] -M [-v]... [<pattern>]...
+  zabbixctl [options] -M [-v]... [<pattern>]... -a <maintenance>
+  zabbixctl [options] -M [-v]... -r <maintenance>
+  zabbixctl [options] -H [-v]... [<pattern>]...
+  zabbixctl [options] -H [-v]... -r <hostname>
   zabbixctl -h | --help
   zabbixctl --version
 `
@@ -167,6 +208,12 @@ Options:
   -G --groups
     -a --add <user>
     -r --remove <user>
+  -M --maintenances
+    -z --read-stdin
+    --period <period>      [default: 1d]
+    --start <date>
+    --end <date>
+  -H --hosts
   -c --config <path>     [default: $HOME/.config/zabbixctl.conf]
   -v --verbosity
   -h --help

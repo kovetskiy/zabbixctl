@@ -23,11 +23,11 @@ const (
 type Params map[string]interface{}
 
 type Request struct {
-	RPC    string `json:"jsonrpc"`
-	Method string `json:"method"`
-	Params Params `json:"params"`
-	Auth   string `json:"auth,omitempty"`
-	ID     int64  `json:"id"`
+	RPC    string      `json:"jsonrpc"`
+	Method string      `json:"method"`
+	Params interface{} `json:"params"`
+	Auth   string      `json:"auth,omitempty"`
+	ID     int64       `json:"id"`
 }
 
 type Zabbix struct {
@@ -217,6 +217,53 @@ func (zabbix *Zabbix) GetTriggers(extend Params) ([]Trigger, error) {
 	return triggers, nil
 }
 
+func (zabbix *Zabbix) GetMaintenances(params Params) ([]Maintenance, error) {
+	debugln("* retrieving maintenances list")
+
+	var response ResponseMaintenances
+	err := zabbix.call("maintenance.get", params, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var maintenances []Maintenance
+	for _, maintenance := range response.Data {
+		maintenances = append(maintenances, maintenance)
+	}
+
+	return maintenances, nil
+}
+
+func (zabbix *Zabbix) CreateMaintenance(params Params) (Maintenances, error) {
+	debugln("* create maintenances list")
+
+	var response ResponseMaintenancesArray
+
+	err := zabbix.call("maintenance.create", params, &response)
+
+	return response.Data, err
+}
+
+func (zabbix *Zabbix) UpdateMaintenance(params Params) (Maintenances, error) {
+	debugln("* update maintenances list")
+
+	var response ResponseMaintenancesArray
+
+	err := zabbix.call("maintenance.update", params, &response)
+
+	return response.Data, err
+}
+
+func (zabbix *Zabbix) RemoveMaintenance(params interface{}) (Maintenances, error) {
+	debugln("* remove maintenances")
+
+	var response ResponseMaintenancesArray
+
+	err := zabbix.call("maintenance.delete", params, &response)
+
+	return response.Data, err
+}
+
 func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 	debugln("* retrieving items list")
 
@@ -339,6 +386,24 @@ func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
 	return response.Data, nil
 }
 
+func (zabbix *Zabbix) RemoveHosts(params interface{}) (Hosts, error) {
+	debugf("* remove hosts list")
+
+	var response ResponseHostsArray
+	err := zabbix.call("host.delete", params, &response)
+
+	return response.Data, err
+}
+
+func (zabbix *Zabbix) GetGroups(params Params) ([]Group, error) {
+	debugf("* retrieving groups list")
+
+	var response ResponseGroups
+	err := zabbix.call("hostgroup.get", params, &response)
+
+	return response.Data, err
+}
+
 func (zabbix *Zabbix) GetGraphURL(identifier string) string {
 	return zabbix.getGraphURL([]string{identifier}, "showgraph", "0")
 }
@@ -396,7 +461,7 @@ func (zabbix *Zabbix) GetHistory(extend Params) ([]History, error) {
 }
 
 func (zabbix *Zabbix) call(
-	method string, params Params, response Response,
+	method string, params interface{}, response Response,
 ) error {
 	debugf("~> %s", method)
 	debugParams(params)
@@ -490,22 +555,33 @@ func (zabbix *Zabbix) call(
 	return nil
 }
 
-func debugParams(params Params, prefix ...string) {
-	for key, value := range params {
-		if valueParams, ok := value.(Params); ok {
-			debugParams(valueParams, append(prefix, key)...)
-			continue
-		}
+func debugParams(params interface{}, prefix ...string) {
 
-		if key == "password" {
-			value = "**********"
-		}
+	switch params.(type) {
+	case Params:
+		p, _ := params.(Params)
+		for key, value := range p {
+			if valueParams, ok := value.(Params); ok {
+				debugParams(valueParams, append(prefix, key)...)
+				continue
+			}
 
-		debugf(
-			"** %s%s: %v",
-			strings.Join(append(prefix, ""), "."),
-			key, value,
-		)
+			if key == "password" {
+				value = "**********"
+			}
+
+			debugf(
+				"** %s%s: %v",
+				strings.Join(append(prefix, ""), "."),
+				key, value,
+			)
+		}
+	case interface{}:
+		if p, ok := params.([]string); ok {
+			for _, value := range p {
+				debugf("** %v", value)
+			}
+		}
 	}
 }
 
