@@ -9,7 +9,7 @@ hosts latest data and groups of users.
 ## Installation
 
 ```
-go get github.com/kovetskiy/zabbixctl
+go get github.com/zarplata/zabbixctl
 ```
 
 afterwards executable will be placed as `$GOPATH/bin/zabbixctl`
