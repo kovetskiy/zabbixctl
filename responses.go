@@ -31,6 +31,11 @@ type ResponseLogin struct {
 	Token string `json:"result"`
 }
 
+type ResponseApiVersion struct {
+	ResponseRaw
+	Version string `json:"result"`
+}
+
 type ResponseTriggers struct {
 	ResponseRaw
 	Data map[string]Trigger `json:"result"`

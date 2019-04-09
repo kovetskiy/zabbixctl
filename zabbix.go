@@ -20,6 +20,11 @@ const (
 	ZabbixSessionTTL = 900 - 60
 )
 
+var (
+	withAuthFlag    = true
+	withoutAuthFlag = false
+)
+
 type Params map[string]interface{}
 
 type Request struct {
@@ -31,11 +36,12 @@ type Request struct {
 }
 
 type Zabbix struct {
-	basicURL  string
-	apiURL    string
-	session   string
-	client    *http.Client
-	requestID int64
+	basicURL   string
+	apiURL     string
+	session    string
+	client     *http.Client
+	requestID  int64
+	apiVersion string
 }
 
 func NewZabbix(
@@ -96,6 +102,16 @@ func NewZabbix(
 		}
 	}
 
+	if len(zabbix.apiVersion) < 1 {
+		err = zabbix.GetApiVersion()
+		if err != nil {
+			return nil, karma.Format(
+				err,
+				"can't get zabbix api version",
+			)
+		}
+	}
+
 	return zabbix, nil
 }
 
@@ -144,6 +160,26 @@ func (zabbix *Zabbix) saveSession(path string) error {
 	return nil
 }
 
+func (zabbix *Zabbix) GetApiVersion() error {
+	var response ResponseApiVersion
+
+	debugln("* apiinfo.version")
+
+	err := zabbix.call(
+		"apiinfo.version",
+		Params{},
+		&response,
+		withoutAuthFlag,
+	)
+	if err != nil {
+		return err
+	}
+
+	zabbix.apiVersion = response.Version
+
+	return nil
+}
+
 func (zabbix *Zabbix) Login(username, password string) error {
 	var response ResponseLogin
 
@@ -153,6 +189,7 @@ func (zabbix *Zabbix) Login(username, password string) error {
 		"user.login",
 		Params{"user": username, "password": password},
 		&response,
+		withAuthFlag,
 	)
 	if err != nil {
 		return err
@@ -168,13 +205,38 @@ func (zabbix *Zabbix) Acknowledge(identifiers []string) error {
 
 	debugln("* acknowledging triggers")
 
+	params := Params{
+		"eventids": identifiers,
+		"message":  "ack",
+	}
+
+	if len(strings.Split(zabbix.apiVersion, ".")) < 1 {
+		return karma.Format("can't parse zabbix version %s", zabbix.apiVersion)
+	}
+
+	majorZabbixVersion := strings.Split(zabbix.apiVersion, ".")[0]
+
+	switch majorZabbixVersion {
+
+	case "4":
+		//https://www.zabbix.com/documentation/4.0/manual/api/reference/event/acknowledge
+		params["action"] = 6
+
+	case "3":
+		//https://www.zabbix.com/documentation/3.4/manual/api/reference/event/acknowledge
+		params["action"] = 1
+
+		//defaul:
+		//https://www.zabbix.com/documentation/1.8/api/event/acknowledge
+		//https://www.zabbix.com/documentation/2.0/manual/appendix/api/event/acknowledge
+
+	}
+
 	err := zabbix.call(
 		"event.acknowledge",
-		Params{
-			"eventids": identifiers,
-			"message":  "ack",
-		},
+		params,
 		&response,
+		withAuthFlag,
 	)
 	if err != nil {
 		return err
@@ -204,7 +266,7 @@ func (zabbix *Zabbix) GetTriggers(extend Params) ([]Trigger, error) {
 	}
 
 	var response ResponseTriggers
-	err := zabbix.call("trigger.get", params, &response)
+	err := zabbix.call("trigger.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +283,7 @@ func (zabbix *Zabbix) GetMaintenances(params Params) ([]Maintenance, error) {
 	debugln("* retrieving maintenances list")
 
 	var response ResponseMaintenances
-	err := zabbix.call("maintenance.get", params, &response)
+	err := zabbix.call("maintenance.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +301,7 @@ func (zabbix *Zabbix) CreateMaintenance(params Params) (Maintenances, error) {
 
 	var response ResponseMaintenancesArray
 
-	err := zabbix.call("maintenance.create", params, &response)
+	err := zabbix.call("maintenance.create", params, &response, withAuthFlag)
 
 	return response.Data, err
 }
@@ -249,7 +311,7 @@ func (zabbix *Zabbix) UpdateMaintenance(params Params) (Maintenances, error) {
 
 	var response ResponseMaintenancesArray
 
-	err := zabbix.call("maintenance.update", params, &response)
+	err := zabbix.call("maintenance.update", params, &response, withAuthFlag)
 
 	return response.Data, err
 }
@@ -259,7 +321,7 @@ func (zabbix *Zabbix) RemoveMaintenance(params interface{}) (Maintenances, error
 
 	var response ResponseMaintenancesArray
 
-	err := zabbix.call("maintenance.delete", params, &response)
+	err := zabbix.call("maintenance.delete", params, &response, withAuthFlag)
 
 	return response.Data, err
 }
@@ -268,7 +330,7 @@ func (zabbix *Zabbix) GetItems(params Params) ([]Item, error) {
 	debugln("* retrieving items list")
 
 	var response ResponseItems
-	err := zabbix.call("item.get", params, &response)
+	err := zabbix.call("item.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -280,7 +342,7 @@ func (zabbix *Zabbix) GetHTTPTests(params Params) ([]HTTPTest, error) {
 	debugln("* retrieving web scenarios list")
 
 	var response ResponseHTTPTests
-	err := zabbix.call("httptest.get", params, &response)
+	err := zabbix.call("httptest.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +354,7 @@ func (zabbix *Zabbix) GetUsersGroups(params Params) ([]UserGroup, error) {
 	debugln("* retrieving users groups list")
 
 	var response ResponseUserGroup
-	err := zabbix.call("usergroup.get", params, &response)
+	err := zabbix.call("usergroup.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -317,6 +379,7 @@ func (zabbix *Zabbix) AddUserToGroups(
 			"usergroup.update",
 			Params{"usrgrpid": group.ID, "userids": identifiers},
 			&ResponseRaw{},
+			withAuthFlag,
 		)
 		if err != nil {
 			return karma.Format(
@@ -350,6 +413,7 @@ func (zabbix *Zabbix) RemoveUserFromGroups(
 			"usergroup.update",
 			Params{"usrgrpid": group.ID, "userids": identifiers},
 			&ResponseRaw{},
+			withAuthFlag,
 		)
 		if err != nil {
 			return karma.Format(
@@ -366,7 +430,7 @@ func (zabbix *Zabbix) GetUsers(params Params) ([]User, error) {
 	debugln("* retrieving users list")
 
 	var response ResponseUsers
-	err := zabbix.call("user.get", params, &response)
+	err := zabbix.call("user.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -378,7 +442,7 @@ func (zabbix *Zabbix) GetHosts(params Params) ([]Host, error) {
 	debugf("* retrieving hosts list")
 
 	var response ResponseHosts
-	err := zabbix.call("host.get", params, &response)
+	err := zabbix.call("host.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +454,7 @@ func (zabbix *Zabbix) RemoveHosts(params interface{}) (Hosts, error) {
 	debugf("* remove hosts list")
 
 	var response ResponseHostsArray
-	err := zabbix.call("host.delete", params, &response)
+	err := zabbix.call("host.delete", params, &response, withAuthFlag)
 
 	return response.Data, err
 }
@@ -399,7 +463,7 @@ func (zabbix *Zabbix) GetGroups(params Params) ([]Group, error) {
 	debugf("* retrieving groups list")
 
 	var response ResponseGroups
-	err := zabbix.call("hostgroup.get", params, &response)
+	err := zabbix.call("hostgroup.get", params, &response, withAuthFlag)
 
 	return response.Data, err
 }
@@ -452,7 +516,7 @@ func (zabbix *Zabbix) GetHistory(extend Params) ([]History, error) {
 	}
 
 	var response ResponseHistory
-	err := zabbix.call("history.get", params, &response)
+	err := zabbix.call("history.get", params, &response, withAuthFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -461,7 +525,7 @@ func (zabbix *Zabbix) GetHistory(extend Params) ([]History, error) {
 }
 
 func (zabbix *Zabbix) call(
-	method string, params interface{}, response Response,
+	method string, params interface{}, response Response, authFlag bool,
 ) error {
 	debugf("~> %s", method)
 	debugParams(params)
@@ -470,8 +534,11 @@ func (zabbix *Zabbix) call(
 		RPC:    "2.0",
 		Method: method,
 		Params: params,
-		Auth:   zabbix.session,
 		ID:     atomic.AddInt64(&zabbix.requestID, 1),
+	}
+
+	if authFlag {
+		request.Auth = zabbix.session
 	}
 
 	buffer, err := json.Marshal(request)
