@@ -76,7 +76,7 @@ func handleLatestData(
 	err = withSpinner(
 		":: Requesting information about hosts items & web scenarios",
 		func() error {
-			errs := make(chan error, 0)
+			errs := make(chan error)
 
 			go func() {
 				var err error
