@@ -31,10 +31,10 @@ func (trigger *Trigger) String() string {
 }
 
 func (trigger *Trigger) GetHostName() string {
-    if len(trigger.Hosts) > 0 {
+	if len(trigger.Hosts) > 0 {
 		return trigger.Hosts[0].Name
-    }
-    return "<missing>"
+	}
+	return "<missing>"
 }
 
 func (trigger *Trigger) StatusAcknowledge() string {
@@ -63,7 +63,7 @@ func (trigger *Trigger) DateTime() string {
 }
 
 func (trigger *Trigger) Age() string {
-	date := time.Now().Sub(trigger.date())
+	date := time.Since(trigger.date())
 
 	var (
 		seconds = int(date.Seconds()) % 60

@@ -116,7 +116,7 @@ func (zabbix *Zabbix) restoreSession(path string) error {
 		)
 	}
 
-	if time.Now().Sub(stat.ModTime()).Seconds() < ZabbixSessionTTL {
+	if time.Since(stat.ModTime()).Seconds() < ZabbixSessionTTL {
 		session, err := ioutil.ReadAll(file)
 		if err != nil {
 			return karma.Format(
