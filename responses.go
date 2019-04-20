@@ -31,9 +31,25 @@ type ResponseLogin struct {
 	Token string `json:"result"`
 }
 
+type ResponseApiVersion struct {
+	ResponseRaw
+	Version string `json:"result"`
+}
+
 type ResponseTriggers struct {
 	ResponseRaw
 	Data map[string]Trigger `json:"result"`
+}
+
+type ResponseMaintenances struct {
+	ResponseRaw
+	Data []Maintenance `json:"result"`
+}
+
+// Response Create/Delete maintenace
+type ResponseMaintenancesArray struct {
+	ResponseRaw
+	Data Maintenances `json:"result"`
 }
 
 type ResponseItems struct {
@@ -49,6 +65,17 @@ type ResponseHTTPTests struct {
 type ResponseHosts struct {
 	ResponseRaw
 	Data []Host `json:"result"`
+}
+
+// Response Create/Delete host
+type ResponseHostsArray struct {
+	ResponseRaw
+	Data Hosts `json:"result"`
+}
+
+type ResponseGroups struct {
+	ResponseRaw
+	Data []Group `json:"result"`
 }
 
 type ResponseUserGroup struct {

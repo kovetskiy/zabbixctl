@@ -117,6 +117,31 @@ Do not prompt confirmation dialog.
 Returns single link which points to the stacked or normal graph for matched
 items.
 
+##### -M --maintenances
+Search and operate on configuration of maintenance. Maintenance could be
+filtered using /<pattern> argument, for example, search maintenance match the
+word 'update-kernel':
+
+```
+zabbixctl -M dbnode-* /update-kernel
+```
+
+##### -a --add
+Add new specified <maintenance> with timeperiod type once.
+
+##### -r --remove
+Remove specified <maintenance>.
+
+##### -H --hosts
+Search and operate with host.
+
+```
+zabbixctl -H dbnode-*
+```
+
+##### -r --remove
+Remove specified <host>.
+
 ## Examples
 
 ### Listing triggers in a problem state
@@ -171,6 +196,66 @@ zabbixctl -G /admin
 
 ```
 zabbixctl -G /guest -a admin
+```
+
+### Listing maintenances period
+
+```
+zabbixct -M
+```
+
+### Listing maintenances period with hostname like 'dbnode*'
+
+```
+zabbixct -M dbnode*
+```
+
+### Listing maintenances period with hostname like 'dbnode*' with filter
+maintenance name update-kernel
+
+```
+zabbixct -M dbnode* /update-kernel
+```
+
+### Add maintenance period name update-kernel with hostname like 'dbnode*'
+
+```
+zabbixctl -M dbnode* -a update-kernel
+```
+
+### Add maintenance period name update-kernel with host from stdin (must be flag -f)
+
+axfr is a tool of your choice for retrieving domain information from your infrastructure DNS.
+
+```
+axfr | grep phpnode | zabbixctl -M -z -a update-kernel -f
+```
+
+### Add maintenance period name update-kernel with hostname like 'dbnode*' and read additional
+host from stdin (must be flag -f)
+
+axfr is a tool of your choice for retrieving domain information from your infrastructure DNS.
+
+```
+axfr | grep phpnode | zabbixctl -M -z dbnode* -a update-kernel -f
+```
+
+### Remove maintenance period name update-kernel
+
+```
+zabbixctl -M -r update-kernel
+```
+
+### Search host with hostname like 'dbnode*'
+
+```
+zabbixctl -H dbnode*
+```
+
+### Remove host with hostname 'dbnode1' (full uniq name)
+
+```
+zabbixctl -H -r dbnode1
 ```
 
 ## License

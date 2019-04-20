@@ -66,6 +66,10 @@ func main() {
 		err = handleLatestData(zabbix, config, args)
 	case args["--groups"].(bool):
 		err = handleUsersGroups(zabbix, config, args)
+	case args["--maintenances"].(bool):
+		err = handleMaintenances(zabbix, config, args)
+	case args["--hosts"].(bool):
+		err = handleHosts(zabbix, config, args)
 
 	}
 
