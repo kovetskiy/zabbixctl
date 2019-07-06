@@ -147,13 +147,13 @@ Remove specified <host>.
 ### Listing triggers in a problem state
 
 ```
-zabbixctlp -Tp
+zabbixctl -Tp
 ```
 
 ### Listing triggers that have recenty been in a problem state
 
 ```
-zabbixctlp -Tr
+zabbixctl -Tr
 ```
 
 ### Listing and filtering triggers that contain a word mysql
@@ -201,20 +201,20 @@ zabbixctl -G /guest -a admin
 ### Listing maintenances period
 
 ```
-zabbixct -M
+zabbixctl -M
 ```
 
 ### Listing maintenances period with hostname like 'dbnode*'
 
 ```
-zabbixct -M dbnode*
+zabbixctl -M dbnode*
 ```
 
 ### Listing maintenances period with hostname like 'dbnode*' with filter
 maintenance name update-kernel
 
 ```
-zabbixct -M dbnode* /update-kernel
+zabbixctl -M dbnode* /update-kernel
 ```
 
 ### Add maintenance period name update-kernel with hostname like 'dbnode*'
