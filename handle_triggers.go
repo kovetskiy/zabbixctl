@@ -7,7 +7,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/reconquest/karma-go"
-	"github.com/simplereach/timeutils"
 )
 
 type ExtendedOutput int
@@ -255,15 +254,6 @@ func parseParams(args map[string]interface{}) (Params, error) {
 	}
 
 	return params, err
-}
-
-func parseDateTime(value string) (int64, error) {
-	date, err := timeutils.ParseDateString(value)
-	if err != nil {
-		return 0, karma.Format(err, "can't parse datetime '%s'", value)
-	}
-
-	return date.Unix(), nil
 }
 
 func confirmAcknowledge() bool {
