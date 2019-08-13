@@ -586,10 +586,9 @@ func (zabbix *Zabbix) call(
 	if traceMode {
 		var tracing bytes.Buffer
 		err = json.Indent(&tracing, body, "", "  ")
-		return karma.Format(
-			err,
-			"can't indent api response body",
-		)
+		if err != nil {
+			return karma.Format(err, "can't indent api response body")
+		}
 		tracef("<~ %s", tracing.String())
 	}
 

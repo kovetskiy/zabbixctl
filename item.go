@@ -39,7 +39,6 @@ func (item *Item) getLastClock() string {
 		return fmt.Sprint(int64(typed))
 	default:
 		panic("asdasdasd")
-		return "0"
 	}
 }
 
