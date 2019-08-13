@@ -11,7 +11,7 @@ import (
 
 const (
 	// https://www.zabbix.com/documentation/3.4/manual/api/reference/host/get
-	hosts_get = `
+	hostsGet = `
 {
     "jsonrpc": "2.0",
     "result": [
@@ -100,7 +100,7 @@ const (
 }`
 
 	// https://www.zabbix.com/documentation/3.4/manual/api/reference/host/delete
-	hosts_remove = `
+	hostsRemove = `
 {
     "jsonrpc": "2.0",
     "result": {
@@ -118,7 +118,7 @@ func TestHostsGet(t *testing.T) {
 
 	testserver := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, hosts_get)
+			fmt.Fprint(w, hostsGet)
 		},
 	))
 	defer testserver.Close()
@@ -143,7 +143,7 @@ func TestHostsRemove(t *testing.T) {
 
 	testserver := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, hosts_remove)
+			fmt.Fprint(w, hostsRemove)
 		},
 	))
 	defer testserver.Close()

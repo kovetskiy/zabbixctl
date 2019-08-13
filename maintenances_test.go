@@ -12,7 +12,7 @@ import (
 
 const (
 	// https://www.zabbix.com/documentation/3.4/manual/api/reference/maintenance/get
-	maintenance_get = `
+	maintenanceGet = `
 {
     "jsonrpc": "2.0",
     "result": [
@@ -49,7 +49,7 @@ const (
 }`
 
 	// https://www.zabbix.com/documentation/3.4/manual/api/reference/maintenance/delete
-	maintenances_remove = `
+	maintenancesRemove = `
 {
     "jsonrpc": "2.0",
     "result": {
@@ -63,7 +63,7 @@ const (
 `
 
 	// https://www.zabbix.com/documentation/3.4/manual/api/reference/maintenance/create
-	maintenance_create = `
+	maintenanceCreate = `
 {
     "jsonrpc": "2.0",
     "result": {
@@ -81,7 +81,7 @@ func TestMaintenanceGet(t *testing.T) {
 
 	testserver := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, maintenance_get)
+			fmt.Fprint(w, maintenanceGet)
 		},
 	))
 	defer testserver.Close()
@@ -109,7 +109,7 @@ func TestMaintenanceRemove(t *testing.T) {
 
 	testserver := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, maintenances_remove)
+			fmt.Fprint(w, maintenancesRemove)
 		},
 	))
 	defer testserver.Close()
@@ -135,7 +135,7 @@ func TestMaintenanceCreate(t *testing.T) {
 
 	testserver := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, maintenance_create)
+			fmt.Fprint(w, maintenanceCreate)
 		},
 	))
 	defer testserver.Close()
