@@ -7,11 +7,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/olekukonko/tablewriter"
 	karma "github.com/reconquest/karma-go"
-	"github.com/simplereach/timeutils"
 )
 
 func handleMaintenances(
@@ -613,31 +611,6 @@ func createTimeperiod(
 	timeperiod.Period = strconv.FormatInt(int64(periodSeconds), 10)
 
 	return timeperiod, strconv.FormatInt(int64(activeTill), 10), nil
-}
-
-func parseDate(date string) (int64, error) {
-
-	var dateUnix int64
-
-	destiny := karma.Describe("method", "parseDate")
-
-	if date == "" {
-		timeNow := time.Now()
-		dateUnix = timeNow.Unix()
-	} else {
-		dateParse, err := timeutils.ParseDateString(date)
-		if err != nil {
-			return dateUnix, destiny.Describe(
-				"error", err,
-			).Describe(
-				"date", date,
-			).Reason(
-				"can't convert date to unixtime",
-			)
-		}
-		dateUnix = dateParse.Unix()
-	}
-	return dateUnix, nil
 }
 
 func parsePeriod(targets string) (int64, error) {
