@@ -226,7 +226,7 @@ func (zabbix *Zabbix) Acknowledge(identifiers []string) error {
 		//https://www.zabbix.com/documentation/3.4/manual/api/reference/event/acknowledge
 		params["action"] = 1
 
-		//defaul:
+		//default:
 		//https://www.zabbix.com/documentation/1.8/api/event/acknowledge
 		//https://www.zabbix.com/documentation/2.0/manual/appendix/api/event/acknowledge
 
