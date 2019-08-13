@@ -259,6 +259,9 @@ func parseParams(args map[string]interface{}) (Params, error) {
 func confirmAcknowledge() bool {
 	var value string
 	fmt.Fprintf(os.Stderr, "\n:: Proceed with acknowledge? [Y/n]: ")
-	fmt.Scanln(&value)
+	_, err := fmt.Scanln(&value)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return value == "" || value == "Y" || value == "y"
 }

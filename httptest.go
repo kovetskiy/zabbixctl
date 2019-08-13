@@ -35,7 +35,10 @@ func (check *HTTPTest) DateTime() string {
 }
 
 func (check *HTTPTest) date() time.Time {
-	date, _ := strconv.ParseInt(check.NextCheck, 10, 64)
+	date, err := strconv.ParseInt(check.NextCheck, 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return time.Unix(date, 0)
 }
 

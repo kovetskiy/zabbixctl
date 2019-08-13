@@ -163,7 +163,10 @@ func handleLatestData(
 		fmt.Println(zabbix.GetNormalGraphURL(matchedItemIDs))
 
 	default:
-		table.Flush()
+		err = table.Flush()
+		if err != nil {
+			debugf("Error: %+v", err)
+		}
 	}
 
 	return nil

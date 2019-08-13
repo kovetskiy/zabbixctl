@@ -48,6 +48,9 @@ func (maintenance *Maintenance) GetStatus() string {
 }
 
 func (maintenance *Maintenance) GetDateTime(unixtime string) string {
-	date, _ := strconv.ParseInt(unixtime, 10, 64)
+	date, err := strconv.ParseInt(unixtime, 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return time.Unix(date, 0).Format("2006-01-02 15:04:05")
 }

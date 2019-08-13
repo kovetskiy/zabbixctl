@@ -64,7 +64,10 @@ func handleUsersGroups(
 		found = true
 	}
 
-	table.Flush()
+	err = table.Flush()
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 
 	if !found || (addUser == "" && removeUser == "") {
 		return nil
@@ -222,7 +225,10 @@ func confirmAdding(user string) bool {
 		"\n:: Proceed with adding user %s to specified groups? [Y/n]: ",
 		user,
 	)
-	fmt.Scanln(&value)
+	_, err := fmt.Scanln(&value)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return value == "" || value == "Y" || value == "y"
 }
 
@@ -233,6 +239,9 @@ func confirmRemoving(user string) bool {
 		"\n:: Proceed with removing user %s from specified groups? [Y/n]: ",
 		user,
 	)
-	fmt.Scanln(&value)
+	_, err := fmt.Scanln(&value)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return value == "" || value == "Y" || value == "y"
 }

@@ -54,7 +54,10 @@ func (trigger *Trigger) StatusProblem() string {
 }
 
 func (trigger *Trigger) Severity() Severity {
-	value, _ := strconv.Atoi(trigger.Priority)
+	value, err := strconv.Atoi(trigger.Priority)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return Severity(value)
 }
 
@@ -85,7 +88,10 @@ func (trigger *Trigger) Age() string {
 }
 
 func (trigger *Trigger) date() time.Time {
-	date, _ := strconv.ParseInt(trigger.LastChange, 10, 64)
+	date, err := strconv.ParseInt(trigger.LastChange, 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return time.Unix(date, 0)
 }
 

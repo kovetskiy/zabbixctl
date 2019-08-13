@@ -34,11 +34,17 @@ func (timeperiod *Timeperiod) GetType() string {
 }
 
 func (timeperiod *Timeperiod) GetStartDate() string {
-	date, _ := strconv.ParseInt(timeperiod.StartDate, 10, 64)
+	date, err := strconv.ParseInt(timeperiod.StartDate, 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return time.Unix(date, 0).Format("2006-01-02 15:04:05")
 }
 
 func (timeperiod *Timeperiod) GetPeriodMinute() int64 {
-	period, _ := strconv.ParseInt(timeperiod.Period, 10, 64)
+	period, err := strconv.ParseInt(timeperiod.Period, 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return (period / 60)
 }

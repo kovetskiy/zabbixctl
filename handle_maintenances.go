@@ -145,7 +145,10 @@ func handleAddMaintenance(
 		}
 	}
 
-	printHostsTable(hosts)
+	err = printHostsTable(hosts)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 
 	if confirmation {
 		if !confirmMaintenance("create", addMaintenance) {
@@ -256,7 +259,10 @@ func handleUpdateMaintenance(
 		}
 	}
 
-	printHostsTable(hosts)
+	err = printHostsTable(hosts)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 
 	if confirmation {
 		if fromStdin {
@@ -318,7 +324,10 @@ func handleRemoveMaintenance(
 		)
 	}
 
-	printMaintenancesTable(maintenances, pattern, extend)
+	err = printMaintenancesTable(maintenances, pattern, extend)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 
 	if confirmation {
 		if !confirmMaintenance("removing", removeMaintenance) {
@@ -428,16 +437,15 @@ func handleListMaintenances(
 		)
 	}
 
-	printMaintenancesTable(maintenances, pattern, extend)
-
+	err = printMaintenancesTable(maintenances, pattern, extend)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return nil
 }
 
-func printMaintenancesTable(
-	maintenances []Maintenance,
-	pattern string,
-	extend bool,
-) error {
+func printMaintenancesTable(maintenances []Maintenance, pattern string,
+	extend bool) error {
 
 	var lines = [][]string{}
 
@@ -660,6 +668,9 @@ func confirmMaintenance(messages, maintenance string) bool {
 		maintenance,
 	)
 
-	fmt.Scanln(&value)
+	_, err := fmt.Scanln(&value)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return value == "" || value == "Y" || value == "y"
 }

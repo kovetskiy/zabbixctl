@@ -51,9 +51,10 @@ func getSearchPattern(query []string) string {
 }
 
 func matchPattern(pattern, target string) bool {
-	match, _ := regexp.MatchString(
-		strings.ToLower(pattern),
-		strings.ToLower(target),
-	)
+	match, err := regexp.MatchString(strings.ToLower(pattern),
+		strings.ToLower(target))
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return match
 }
