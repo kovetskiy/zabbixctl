@@ -103,7 +103,7 @@ func NewZabbix(
 	}
 
 	if len(zabbix.apiVersion) < 1 {
-		err = zabbix.GetApiVersion()
+		err = zabbix.GetAPIVersion()
 		if err != nil {
 			return nil, karma.Format(
 				err,
@@ -160,8 +160,8 @@ func (zabbix *Zabbix) saveSession(path string) error {
 	return nil
 }
 
-func (zabbix *Zabbix) GetApiVersion() error {
-	var response ResponseApiVersion
+func (zabbix *Zabbix) GetAPIVersion() error {
+	var response ResponseAPIVersion
 
 	debugln("* apiinfo.version")
 
