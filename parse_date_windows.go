@@ -7,7 +7,6 @@ import (
 )
 
 func parseDate(date string) (int64, error) {
-
 	var dateUnix int64
 
 	destiny := karma.Describe("method", "parseDate")
