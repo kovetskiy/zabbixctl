@@ -39,12 +39,14 @@ func (item *Item) getLastClock() string {
 		return fmt.Sprint(int64(typed))
 	default:
 		panic("asdasdasd")
-		return "0"
 	}
 }
 
 func (item *Item) date() time.Time {
-	date, _ := strconv.ParseInt(item.getLastClock(), 10, 64)
+	date, err := strconv.ParseInt(item.getLastClock(), 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return time.Unix(date, 0)
 }
 

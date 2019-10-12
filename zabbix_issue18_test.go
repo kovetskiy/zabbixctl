@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	issue18_data = `
+	issue18Data = `
 {
   "jsonrpc": "2.0",
   "result": [
@@ -162,7 +162,7 @@ func TestIssue18(t *testing.T) {
 
 	testserver := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, issue18_data)
+			fmt.Fprint(w, issue18Data)
 		},
 	))
 	defer testserver.Close()

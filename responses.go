@@ -31,7 +31,7 @@ type ResponseLogin struct {
 	Token string `json:"result"`
 }
 
-type ResponseApiVersion struct {
+type ResponseAPIVersion struct {
 	ResponseRaw
 	Version string `json:"result"`
 }
@@ -46,7 +46,7 @@ type ResponseMaintenances struct {
 	Data []Maintenance `json:"result"`
 }
 
-// Response Create/Delete maintenace
+// Response Create/Delete maintenance
 type ResponseMaintenancesArray struct {
 	ResponseRaw
 	Data Maintenances `json:"result"`

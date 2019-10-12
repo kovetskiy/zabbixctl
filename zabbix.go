@@ -103,7 +103,7 @@ func NewZabbix(
 	}
 
 	if len(zabbix.apiVersion) < 1 {
-		err = zabbix.GetApiVersion()
+		err = zabbix.GetAPIVersion()
 		if err != nil {
 			return nil, karma.Format(
 				err,
@@ -160,8 +160,8 @@ func (zabbix *Zabbix) saveSession(path string) error {
 	return nil
 }
 
-func (zabbix *Zabbix) GetApiVersion() error {
-	var response ResponseApiVersion
+func (zabbix *Zabbix) GetAPIVersion() error {
+	var response ResponseAPIVersion
 
 	debugln("* apiinfo.version")
 
@@ -226,7 +226,7 @@ func (zabbix *Zabbix) Acknowledge(identifiers []string) error {
 		//https://www.zabbix.com/documentation/3.4/manual/api/reference/event/acknowledge
 		params["action"] = 1
 
-		//defaul:
+		//default:
 		//https://www.zabbix.com/documentation/1.8/api/event/acknowledge
 		//https://www.zabbix.com/documentation/2.0/manual/appendix/api/event/acknowledge
 
@@ -585,7 +585,10 @@ func (zabbix *Zabbix) call(
 
 	if traceMode {
 		var tracing bytes.Buffer
-		json.Indent(&tracing, body, "", "  ")
+		err = json.Indent(&tracing, body, "", "  ")
+		if err != nil {
+			return karma.Format(err, "can't indent api response body")
+		}
 		tracef("<~ %s", tracing.String())
 	}
 

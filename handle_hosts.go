@@ -52,7 +52,10 @@ func handleHosts(
 
 		}
 		if len(hostsTable) > 0 {
-			printHostsTable(hostsTable)
+			err = printHostsTable(hostsTable)
+			if err != nil {
+				debugf("Error: %+v", err)
+			}
 		}
 
 	}
@@ -96,7 +99,10 @@ func handleRemoveHosts(
 		)
 	}
 
-	printHostsTable(hosts)
+	err = printHostsTable(hosts)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 
 	if confirmation {
 		if !confirmHost("removing", removeHost) {
@@ -147,9 +153,7 @@ func searchHosts(zabbix *Zabbix, hostname string) ([]Host, error) {
 	return hosts, err
 }
 
-func printHostsTable(
-	hosts []Host,
-) error {
+func printHostsTable(hosts []Host) error {
 
 	var lines = [][]string{}
 
@@ -178,6 +182,9 @@ func confirmHost(messages, host string) bool {
 		host,
 	)
 
-	fmt.Scanln(&value)
+	_, err := fmt.Scanln(&value)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return value == "" || value == "Y" || value == "y"
 }

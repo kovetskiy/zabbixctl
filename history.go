@@ -22,7 +22,10 @@ func (history *History) String() string {
 }
 
 func (history *History) date() time.Time {
-	date, _ := strconv.ParseInt(history.Clock, 10, 64)
+	date, err := strconv.ParseInt(history.Clock, 10, 64)
+	if err != nil {
+		debugf("Error: %+v", err)
+	}
 	return time.Unix(date, 0)
 }
 
