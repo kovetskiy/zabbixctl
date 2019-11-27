@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -178,6 +179,6 @@ func TestIssue18(t *testing.T) {
 	test.Equal("1548924066", items[0].getLastClock())
 	test.Equal("0", items[1].getLastClock())
 
-	test.Equal("2019-01-31 11:41:06", items[0].DateTime())
+	test.Equal(time.Unix(1548924066, 0).Format(TimeFormat), items[0].DateTime())
 	test.Equal("-", items[1].DateTime())
 }

@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+const (
+	TimeFormat = "2006-01-02 15:04:05"
+)
+
 var (
 	reItemKeyParams = regexp.MustCompile(`\[([^\]]+)\]`)
 )
@@ -28,7 +32,7 @@ func (item *Item) DateTime() string {
 		return "-"
 	}
 
-	return item.date().Format("2006-01-02 15:04:05")
+	return item.date().Format(TimeFormat)
 }
 
 func (item *Item) getLastClock() string {
