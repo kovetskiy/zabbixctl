@@ -159,7 +159,7 @@ zabbixctl -Tr
 ### Listing and filtering triggers that contain a word mysql
 
 ```
-zabbixctlp -T /mysql
+zabbixctl -T /mysql
 ```
 
 ### Listing and acknowledging triggers that severity level is DISASTER
