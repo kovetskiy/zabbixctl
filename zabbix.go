@@ -187,7 +187,7 @@ func (zabbix *Zabbix) Login(username, password string) error {
 
 	err := zabbix.call(
 		"user.login",
-		Params{"user": username, "password": password},
+		Params{"username": username, "password": password},
 		&response,
 		withAuthFlag,
 	)
